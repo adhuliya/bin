@@ -1,0 +1,63 @@
+#!/usr/bin/env python3
+
+"""
+Rendered obsolete: use 'split' and 'cat' to split and join file in any linux.
+"""
+import sys
+import os
+
+def split(filename=None, maxsize=None):
+    suffix = 100
+    BUFSIZE = 1024 * 1024 * 8  # 8 MB
+    countsize = 0
+    EOF = 0
+
+    size = os.path.getsize(filename)
+    print (size)
+    
+    with open(filename, 'rb') as mainfile:
+        #nonlocal countsize, suffix, BUFSIZE, EOF
+        while True:
+            name = filename + "-" + str(suffix)
+            print("Writing file", name)
+
+            f1 = open(name, 'wb')
+            while countsize <  maxsize*1024*1024:
+                buf = mainfile.read(BUFSIZE)
+                print (len(buf))
+                if len(buf) == 0:
+                    print ("EOF")
+                    EOF = 1
+                    break
+                countsize += len(buf)
+                f1.write(buf)
+            f1.close()
+
+            if EOF == 1:
+                print ("File Split")
+                break
+            countsize = 0
+            suffix += 1
+
+
+if __name__ == "__main__":
+    maxsize = 2048     # default is 2 GB
+    errmsg = "Usage: split <filename> [max-size-in-mb]"
+    errmsg2 = "The file '{}' doesnot exist."
+
+    if len(sys.argv) == 1:
+        print(errmsg, file=sys.stderr)
+        exit(1)
+
+    if not os.path.exists(sys.argv[1]):
+        print(errmsg2.format(sys.argc[1]), file=sys.stderr)
+
+    if len(sys.argv) == 3:
+        try:
+            maxsize = int(sys.argv[2]) 
+        except ValueError as verr:
+            print(errmsg, file=sys.stderr)
+
+    split(sys.argv[1], maxsize)
+
+
