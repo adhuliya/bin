@@ -1,0 +1,39 @@
+#!/usr/bin/env python3
+
+import sys
+import re
+
+onekb = "data" * 256
+
+def output(size, unit):
+  times = size
+  # Converting units to KB
+  if unit == "G" or unit == "g":
+    times *= 2**20
+  elif unit == "M" or unit == "m":
+    times *= 2**10
+  elif unit == "K" or unit == "k":
+    times *= 1
+  else:
+    print("Error: Wrong suffix:", unit)
+
+  for i in range(times):
+    print(onekb, end="")
+
+
+def process(size):
+  size = size.strip()
+  m = re.search(r"(\d+)\s*([GMKgmk])", size)
+  if m:
+    output(int(m.group(1)), m.group(2))
+  else:
+    print("Error: Only an integer followed by suffix G,M,K,g,m,k allowed.")
+
+
+if __name__ == "__main__":
+  if len(sys.argv) != 2:
+    print("Enter size argument like 1G, 2G, 2M, 4K")
+  else:
+    process(sys.argv[1])
+
+
