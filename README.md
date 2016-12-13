@@ -1,4 +1,4 @@
-Tips and scripts to manage the mydata files.
+Tips and scripts to manage the mydata files. And other regular commands.
 
 Some useful lines of code for image processing.
 
