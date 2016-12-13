@@ -1,20 +1,26 @@
 #!/bin/bash
 
-cd /home/codeman/mydata/bin-git
+DIR=/home/codeman/mydata/bin-git
+cd $DIR
+echo -e "\n$>>> $DIR\n"
 git fetch origin master ;
 git merge origin/master ;
 git add --all ;
 git commit -m 'automated-update' ;
 git push origin master ;
 
-cd /home/codeman/mydata/configs-git
+DIR=/home/codeman/mydata/configs-git
+cd $DIR
+echo -e "\n$>>> $DIR\n"
 git fetch origin master ;
 git merge origin/master ;
 git add --all ;
 git commit -m 'automated-update' ;
 git push origin master ;
 
-cd /home/codeman/mydata/mynotes-git
+DIR=/home/codeman/mydata/mynotes-git
+cd $DIR
+echo -e "\n$>>> $DIR\n"
 git fetch origin master ;
 git merge origin/master ;
 git add --all ;
