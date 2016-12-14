@@ -5,15 +5,15 @@
 declare -a arr=(
 "/home/codeman/mydata/bin-git"
 "/home/codeman/mydata/configs-git"
-"/home/codeman/mydata/research/code/benchmarks-git"
-"/home/codeman/mydata/research/code/cs618project-git"
+"/home/codeman/mydata/research/misc-git"
 "/home/codeman/mydata/research/meetings-git"
 "/home/codeman/mydata/research/resources-git"
+"/home/codeman/mydata/research/code/benchmarks-git"
+"/home/codeman/mydata/research/code/cs618project-git"
 "/home/codeman/mydata/research/writeups/mandar-report-git"
 "/home/codeman/mydata/research/writeups/mywriteups-git"
 "/home/codeman/mydata/research/writeups/research-notes-git"
 "/home/codeman/mydata/research/writeups/cs618-project-report-git"
-"/home/codeman/mydata/research/misc-git"
 )
 
 ## now loop through the above array
