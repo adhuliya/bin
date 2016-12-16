@@ -1,0 +1,12 @@
+#!/bin/bash
+
+DIR=.
+cd $DIR
+echo -e "\n$>>> $DIR\n"
+git add --all ;
+git commit -m 'semiautomated-update' ;
+git fetch origin master ;
+git merge -m "semiautomated-merge" origin/master ;
+git push origin master ;
+
+
