@@ -5,6 +5,7 @@
 declare -a arr=(
 "/home/codeman/mydata/git/bin-git"
 "/home/codeman/mydata/git/configs-git"
+"/home/codeman/mydata/git/mynotes-git"
 "/home/codeman/mydata/git/research/misc-git"
 "/home/codeman/mydata/git/research/meetings-git"
 "/home/codeman/mydata/git/research/resources-git"
