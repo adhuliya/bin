@@ -15,6 +15,7 @@ declare -a arr=(
 "/home/codeman/mydata/git/research/writeups/mywriteups-git"
 "/home/codeman/mydata/git/research/writeups/research-notes-git"
 "/home/codeman/mydata/git/research/writeups/cs618-project-report-git"
+"/home/codeman/mydata/git/ws/gate-notes-git"
 )
 
 ## now loop through the above array
