@@ -19,6 +19,7 @@ gitdirs = [
 "/home/codeman/mydata/git/research/writeups/cs618-project-report-git",
 "/home/codeman/mydata/git/ws/gate-notes-git",
 "/home/codeman/mydata/git/ws/web-filebrowser-git",
+"/home/codeman/mydata/git/ws/web-organizer-git",
 ]
 
 gitcommands = [
