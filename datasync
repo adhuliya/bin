@@ -23,11 +23,11 @@ gitdirs = [
 ]
 
 gitcommands = [
-"""git add --all ;""",
-"""git commit -m 'automated-update' ;""",
-"""git fetch origin master ;""",
-"""git merge -m "automated-merge" origin/master ;""",
-"""git push origin master ;""",
+"""git add --all""",
+"""git commit -m 'automated-update'""",
+"""git fetch origin master""",
+"""git merge -m "automated-merge" origin/master""",
+"""git push origin master""",
 ]
 
 def syncall():
