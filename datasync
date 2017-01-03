@@ -2,6 +2,7 @@
 
 import subprocess as sub
 import os
+import sys
 
 # list of directories having git repository
 gitdirs = [
@@ -32,19 +33,28 @@ gitcommands = [
 
 def syncall():
     err = 0
+    tmperr = 0
     for dir in gitdirs:
+        tmperr = 0
         print(os.linesep, "$>>> ", dir, os.linesep, sep="")
 
         try:
             os.chdir(dir)
         except FileNotFoundError as e:
-            print("DIRECTORY NOT FOUND")
-            err += 1
+            print("DIRECTORY NOT FOUND", file=sys.stderr)
+            tmperr = 1
             continue
 
         for cmd in gitcommands:
             cp = sub.run(cmd, shell=True)
-            err += cp.returncode
+            if cp.returncode != 0:
+                tmperr = 1
+
+        if tmperr == 0:
+            print("FINISHED WITH SUCCESS")
+        else:
+            err += 1
+            print("FINISHED WITH ERRORS!!", file=sys.stderr)
 
     return err
 
@@ -53,7 +63,7 @@ if __name__ == "__main__":
   print("STARTING PYTHON SCRIPT", os.linesep)
   err = syncall()
   if err:
-      print(os.linesep, "*****FINISHED WITH ERRORS*****", os.linesep, sep="")
+      print(os.linesep, "{} ERRORS".format(err), os.linesep, sep="", file=sys.stderr)
   else:
       print(os.linesep, "SUCCESS.", os.linesep, sep="")
 
