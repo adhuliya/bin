@@ -61,7 +61,7 @@ def syncall():
             errdirs.append(dir)
             print("FINISHED WITH ERRORS!!", file=sys.stderr)
 
-    return err
+    return errdirs
 
 
 if __name__ == "__main__":
