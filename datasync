@@ -46,6 +46,8 @@ def syncall():
             cp = sub.run(cmd, shell=True)
             err += cp.returncode
 
+    return err
+
 
 if __name__ == "__main__":
   print("STARTING PYTHON SCRIPT", os.linesep)
