@@ -49,8 +49,10 @@ def syncall():
         for cmd in gitcommands:
             print("$>", cmd)
             cp = sub.run(cmd, shell=True)
-            print("$>", cmd, ", ReturnCode :", cp.returncode)
-            if cp.returncode != 0:
+            print("$>", "ReturnCode :", cp.returncode)
+            if cmd.find(" commit ") >= 0 and cp.returncode > 1:
+                tmperr = 1
+            elif cp.returncode != 0:
                 tmperr = 1
 
         if tmperr == 0:
