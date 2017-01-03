@@ -50,8 +50,8 @@ def syncall():
             print("$>", cmd)
             cp = sub.run(cmd, shell=True)
             print("$>", "ReturnCode :", cp.returncode)
-            if cmd.find(" commit ") >= 0 and cp.returncode > 1:
-                tmperr = 1
+            if cmd.find(" commit ") >= 0 and cp.returncode == 1:
+                pass
             elif cp.returncode != 0:
                 tmperr = 1
 
