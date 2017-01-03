@@ -32,7 +32,7 @@ gitcommands = [
 ]
 
 def syncall():
-    err = 0
+    errdirs = []
     tmperr = 0
     for dir in gitdirs:
         tmperr = 0
@@ -43,7 +43,7 @@ def syncall():
         except FileNotFoundError as e:
             print("DIRECTORY NOT FOUND", file=sys.stderr)
             # tmperr = 1
-            err += 1
+            errdir.append(dir)
             continue
 
         for cmd in gitcommands:
@@ -58,18 +58,19 @@ def syncall():
         if tmperr == 0:
             print("FINISHED WITH SUCCESS")
         else:
-            err += 1
+            errdir.append(dir)
             print("FINISHED WITH ERRORS!!", file=sys.stderr)
 
     return err
 
 
 if __name__ == "__main__":
-  print("STARTING PYTHON SCRIPT", os.linesep)
-  err = syncall()
-  if err:
-      print(os.linesep, "{} ERRORS".format(err), os.linesep, sep="", file=sys.stderr)
-  else:
-      print(os.linesep, "SUCCESS.", os.linesep, sep="")
+    print("STARTING PYTHON SCRIPT", os.linesep)
+    errdirs = syncall()
+    if errdirs:
+        print("Error Dirs:", os.linesep, errdirs, file=sys.stderr)
+        print(os.linesep, "{} ERRORS".format(len(errdirs)), os.linesep, sep="", file=sys.stderr)
+    else:
+        print(os.linesep, "SUCCESS.", os.linesep, sep="")
 
 
