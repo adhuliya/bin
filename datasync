@@ -42,7 +42,6 @@ def syncall():
             err += 1
             continue
 
-        print(os.linesep, "$>>> ", dir, os.linesep, sep="")
         for cmd in gitcommands:
             cp = sub.run(cmd, shell=True)
             err += cp.returncode
