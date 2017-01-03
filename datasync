@@ -33,7 +33,15 @@ gitcommands = [
 def syncall():
     err = 0
     for dir in gitdirs:
-        os.chdir(dir)
+        print(os.linesep, "$>>> ", dir, os.linesep, sep="")
+
+        try:
+            os.chdir(dir)
+        except FileNotFoundError as e:
+            print("DIRECTORY NOT FOUND")
+            err += 1
+            continue
+
         print(os.linesep, "$>>> ", dir, os.linesep, sep="")
         for cmd in gitcommands:
             cp = sub.run(cmd, shell=True)
