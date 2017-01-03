@@ -43,7 +43,7 @@ def syncall():
         except FileNotFoundError as e:
             print("DIRECTORY NOT FOUND", file=sys.stderr)
             # tmperr = 1
-            errdir.append(dir)
+            errdirs.append(dir)
             continue
 
         for cmd in gitcommands:
@@ -58,7 +58,7 @@ def syncall():
         if tmperr == 0:
             print("FINISHED WITH SUCCESS")
         else:
-            errdir.append(dir)
+            errdirs.append(dir)
             print("FINISHED WITH ERRORS!!", file=sys.stderr)
 
     return err
