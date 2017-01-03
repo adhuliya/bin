@@ -42,11 +42,14 @@ def syncall():
             os.chdir(dir)
         except FileNotFoundError as e:
             print("DIRECTORY NOT FOUND", file=sys.stderr)
-            tmperr = 1
+            # tmperr = 1
+            err += 1
             continue
 
         for cmd in gitcommands:
+            print("$>", cmd)
             cp = sub.run(cmd, shell=True)
+            print("$>", cmd, ", ReturnCode :", cp.returncode)
             if cp.returncode != 0:
                 tmperr = 1
 
