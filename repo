@@ -27,6 +27,7 @@ Default search root directory is "{reporootdir}".
 """.format(reporootdir=reporootdir, repolistfile=repolistfile)
 
 cmd = {
+    "git init": "git init",
     "get origin-url":"git remote get-url origin",
     "set origin-url": "git remote add origin {}",
     "remove origin-url": "git remote remove origin",
@@ -110,65 +111,73 @@ def updateinfo():
         if osp.exists(osp.join(repoabsdir, ".git")):
             # already a git repo
             print("$> ALREADY A GIT REPO")
-            if repoinfo["origin-url"]:
-                print("$> Set origin-url")
+        else:
+            print("$> SETTING UP GIT REPO")
+            command = cmd["git init"]
+            cp = sub.run(command, shell=True)
+            if cp.returncode:
+                errdirs.append(repoabsdir)
+                print("$> Return Code : {}".format(cp.returncode))
 
-                command = cmd["remove origin-url"]
-                cp = sub.run(command, shell=True)
-                if cp.returncode:
-                    errdirs.append(repoabsdir)
-                    print("$> Return Code : {}".format(cp.returncode))
+        if repoinfo["origin-url"]:
+            print("$> Set origin-url")
 
-                command = cmd["set origin-url"].format(repoinfo["origin-url"])
-                print("$> {}".format(command))
-                cp = sub.run(command, shell=True)
-                if cp.returncode:
-                    errdirs.append(repoabsdir)
-                    print("$> Return Code : {}".format(cp.returncode))
-            else:
-                print("$> Get origin-url")
-                command = cmd["get origin-url"]
-                print("$> {}".format(command))
-                originurl = sub.getoutput(command).strip()
-                repoinfo["origin-url"] = originurl
+            command = cmd["remove origin-url"]
+            cp = sub.run(command, shell=True)
+            if cp.returncode:
+                errdirs.append(repoabsdir)
+                print("$> Return Code : {}".format(cp.returncode))
 
-            if repoinfo["user.name"]:
-                print("$> Set user.name")
-                command = cmd["set local-user.name"].format(repoinfo["user.name"])
-                print("$> {}".format(command))
-                cp = sub.run(command, shell=True)
-                if cp.returncode:
-                    errdirs.append(repoabsdir)
-                    print("$> Return Code : {}".format(cp.returncode))
-            else:
-                print("$> Get user.name")
-                command1 = cmd["get local-user.name"]
-                command2 = cmd["get global-user.name"]
-                print("$> {}".format(command1))
-                name = sub.getoutput(command1).strip()
-                if not name:
-                    print("$> {}".format(command2))
-                    name = sub.getoutput(command2).strip()
-                repoinfo["user.name"] = name
+            command = cmd["set origin-url"].format(repoinfo["origin-url"])
+            print("$> {}".format(command))
+            cp = sub.run(command, shell=True)
+            if cp.returncode:
+                errdirs.append(repoabsdir)
+                print("$> Return Code : {}".format(cp.returncode))
+        else:
+            print("$> Get origin-url")
+            command = cmd["get origin-url"]
+            print("$> {}".format(command))
+            originurl = sub.getoutput(command).strip()
+            repoinfo["origin-url"] = originurl
 
-            if repoinfo["user.email"]:
-                print("$> Set user.email")
-                command = cmd["set local-user.email"].format(repoinfo["user.email"])
-                print("$> {}".format(command))
-                cp = sub.run(command, shell=True)
-                if cp.returncode:
-                    errdirs.append(repoabsdir)
-                    print("$> Return Code : {}".format(cp.returncode))
-            else:
-                print("$> Get user.email")
-                command1 = cmd["get local-user.email"]
-                command2 = cmd["get global-user.email"]
-                print("$> {}".format(command1))
-                name = sub.getoutput(command1).strip()
-                if not name:
-                    print("$> {}".format(command2))
-                    name = sub.getoutput(command2).strip()
-                repoinfo["user.email"] = name
+        if repoinfo["user.name"]:
+            print("$> Set user.name")
+            command = cmd["set local-user.name"].format(repoinfo["user.name"])
+            print("$> {}".format(command))
+            cp = sub.run(command, shell=True)
+            if cp.returncode:
+                errdirs.append(repoabsdir)
+                print("$> Return Code : {}".format(cp.returncode))
+        else:
+            print("$> Get user.name")
+            command1 = cmd["get local-user.name"]
+            command2 = cmd["get global-user.name"]
+            print("$> {}".format(command1))
+            name = sub.getoutput(command1).strip()
+            if not name:
+                print("$> {}".format(command2))
+                name = sub.getoutput(command2).strip()
+            repoinfo["user.name"] = name
+
+        if repoinfo["user.email"]:
+            print("$> Set user.email")
+            command = cmd["set local-user.email"].format(repoinfo["user.email"])
+            print("$> {}".format(command))
+            cp = sub.run(command, shell=True)
+            if cp.returncode:
+                errdirs.append(repoabsdir)
+                print("$> Return Code : {}".format(cp.returncode))
+        else:
+            print("$> Get user.email")
+            command1 = cmd["get local-user.email"]
+            command2 = cmd["get global-user.email"]
+            print("$> {}".format(command1))
+            name = sub.getoutput(command1).strip()
+            if not name:
+                print("$> {}".format(command2))
+                name = sub.getoutput(command2).strip()
+            repoinfo["user.email"] = name
 
 
     with open(repolistfile, "w") as f:
