@@ -1,0 +1,200 @@
+#!/usr/bin/env python3
+
+"""
+Viewing and updating list of repos in the git/ directory.
+"""
+
+import sys, os
+import os.path as osp
+import re
+import subprocess as sub
+
+
+mydata = "/home/codeman/mydata"
+reporootdir = mydata + "/git"
+repolistfile = reporootdir + "/configs-git/mydata-data/repositories.pylist"
+
+usagehelpmsg = """Usage: gitrepo [list|listall|update]
+
+[list|listall] are optional subcommands.
+
+list    : lists all directories that have '.git' subdirectory and '-git' suffix.
+listall : lists all directories that have '.git' subdirectory.
+update  : update list of git repositories to the file {repolistfile}.
+
+Default search root directory is "{reporootdir}".
+
+""".format(reporootdir=reporootdir, repolistfile=repolistfile)
+
+cmd = {
+    "get origin-url":"git remote get-url origin",
+    "set origin-url": "git remote add origin {}",
+    "get global-user.name": "git config --global --get user.name",
+    "get local-user.name": "git config --local --get user.name",
+    "set global-user.name": "git config --global user.name \"{}\"",
+    "set local-user.name": "git config --local user.name \"{}\"",
+    "get global-user.email": "git config --global --get user.email",
+    "get local-user.email": "git config --local --get user.email",
+    "set global-user.email": "git config --global user.email \"{}\"",
+    "set local-user.email": "git config --local user.email \"{}\"",
+    "git-init":"git init",
+}
+
+def findgitrepos(rootdir=reporootdir):
+    gitrepos = []
+    for root, dirs, files in os.walk(rootdir, topdown=True):
+        if ".git" in dirs and root.endswith("-git"):
+            relativepath = root.replace(rootdir + "/", "")
+            gitrepos.append(relativepath)
+            dirs[:] = []
+    return gitrepos
+
+
+def findallgitrepos(rootdir=reporootdir):
+    gitrepos = []
+    for root, dirs, files in os.walk(rootdir, topdown=True):
+        if ".git" in dirs:
+            gitrepos.append(root) 
+            dirs[:] = []
+    return gitrepos
+
+
+def getoldreposinfo(repolistfile):
+    oldreposinfo = []
+    with open(repolistfile) as f:
+        content = f.read()
+        if content.strip():
+            oldreposinfo = eval(content)
+
+    return oldreposinfo
+
+
+
+def addnewreposinfo(oldreposinfo, currrepodirs):
+    newrepodirs = []
+    updatedreposinfo = oldreposinfo
+
+    oldrepodirs = [repoinfo["dir"] for repoinfo in oldreposinfo]
+
+    for repodir in currrepodirs:
+        if repodir not in oldrepodirs:
+            newrepodirs.append(repodir)
+
+    for repodir in newrepodirs:
+        d = {"dir":repodir, "origin-url":"", "user.name":"", "user.email":""}
+        updatedreposinfo.append(d)
+
+    return updatedreposinfo
+
+
+def updateinfo():
+    """
+    Note: this function never deletes info of a git directory. To delete, do it maually (with caution of course) by deleting the corresponding line in the gitdirlist file (whereever it may be). And deleting all corresponding direcotries on different machines.
+    """
+    errdirs = []
+
+    oldreposinfo = getoldreposinfo(repolistfile)
+    currrepodirs = findgitrepos()
+
+    updatedreposinfo = addnewreposinfo(oldreposinfo, currrepodirs)
+
+    for repoinfo in updatedreposinfo:
+        repoabsdir = osp.join(reporootdir, repoinfo["dir"])
+
+        os.makedirs(repoabsdir, exist_ok=True)
+
+        os.chdir(repoabsdir)
+
+        print(os.linesep, "$>>> {}".format(repoabsdir), os.linesep, sep="")
+        if osp.exists(osp.join(repoabsdir, ".git")):
+            # already a git repo
+            print("$> ALREADY A GIT REPO")
+            if repoinfo["origin-url"]:
+                print("$> Set origin-url")
+                command = cmd["set origin-url"].format(repoinfo["origin-url"])
+                print("$> {}".format(command))
+                cp = sub.run(command, shell=True)
+                if cp.returncode:
+                    errdirs.append(repoabsdir)
+                    print("$> Return Code : {}".format(cp.returncode))
+            else:
+                print("$> Get origin-url")
+                command = cmd["get origin-url"]
+                print("$> {}".format(command))
+                originurl = sub.getoutput(command).strip()
+                repoinfo["origin-url"] = originurl
+
+            if repoinfo["user.name"]:
+                print("$> Set user.name")
+                command = cmd["set local-user.name"].format(repoinfo["user.name"])
+                print("$> {}".format(command))
+                cp = sub.run(command, shell=True)
+                if cp.returncode:
+                    errdirs.append(repoabsdir)
+                    print("$> Return Code : {}".format(cp.returncode))
+            else:
+                print("$> Get user.name")
+                command1 = cmd["get local-user.name"]
+                command2 = cmd["get global-user.name"]
+                print("$> {}".format(command1))
+                name = sub.getoutput(command1).strip()
+                if not name:
+                    print("$> {}".format(command2))
+                    name = sub.getoutput(command2).strip()
+                repoinfo["user.name"] = name
+
+            if repoinfo["user.email"]:
+                print("$> Set user.email")
+                command = cmd["set local-user.email"].format(repoinfo["user.email"])
+                print("$> {}".format(command))
+                cp = sub.run(command, shell=True)
+                if cp.returncode:
+                    errdirs.append(repoabsdir)
+                    print("$> Return Code : {}".format(cp.returncode))
+            else:
+                print("$> Get user.email")
+                command1 = cmd["get local-user.email"]
+                command2 = cmd["get global-user.email"]
+                print("$> {}".format(command1))
+                name = sub.getoutput(command1).strip()
+                if not name:
+                    print("$> {}".format(command2))
+                    name = sub.getoutput(command2).strip()
+                repoinfo["user.email"] = name
+
+
+    with open(repolistfile, "w") as f:
+        f.write(repr(updatedreposinfo))
+
+    if errdirs:
+        print("$> Error Dirs:")
+        print("$>", errdirs)
+        print(os.linesep, "{} ERRORS".format(len(errdirs)), os.linesep)
+
+
+if __name__ == "__main__":
+    if len(sys.argv) > 2:
+        print(usagehelpmsg, file=sys.stderr)
+        exit(1)
+
+    rootdir = subcmd = gitrepos = None
+    if len(sys.argv) == 1:
+        gitrepos = findgitrepos()
+        print(os.linesep.join(gitrepos))
+        exit(0)
+
+    if len(sys.argv) == 2:
+        subcmd = sys.argv[1].strip().lower()
+        if subcmd == "list":
+            gitrepos = findgitrepos()
+            print(os.linesep.join(gitrepos))
+        elif subcmd == "listall":
+            gitrepos = findallgitrepos()
+            print(os.linesep.join(gitrepos))
+        elif subcmd == "update":
+            updateinfo()
+        else:
+            print(usagehelpmsg, file=sys.stderr)
+            exit(2)
+
+
