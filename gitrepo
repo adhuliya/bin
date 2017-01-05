@@ -1,0 +1,137 @@
+#!/usr/bin/env python3
+
+"""
+#My Sync/Backup Plan
+
+---
+
+Backup script for all the data in the files/folders in the master directory ~/mydata/* and sync application settings.
+
+"""
+
+import sys, os
+import os.path as osp
+import re
+
+
+mydata = "/home/codeman/mydata"
+reporootdir = mydata + "/git"
+repolistfile = reporootdir + "/configs-git/mydata-data/repositories.pylist"
+
+usagehelpmsg = """Usage: gitrepo [list|listall|update]
+
+[list|listall] are optional subcommands.
+
+list    : lists all directories that have '.git' subdirectory and '-git' suffix.
+listall : lists all directories that have '.git' subdirectory.
+update  : update list of git repositories to the file {repolistfile}.
+
+Default search root directory is "{reporootdir}".
+
+""".format(reporootdir=reporootdir, repolistfile=repolistfile)
+
+cmd = {
+    "get origin-url":"git remote get-url origin",
+    "set origin-url": "git remote add origin {}",
+    "get global-user.name": "git config --global --get user.name",
+    "get local-user.name": "git config --local --get user.name",
+    "set global-user.name": "git config --global user.name \"{}\"",
+    "set local-user.name": "git config --local user.name \"{}\"",
+    "get global-user.email": "git config --global --get user.email",
+    "get local-user.email": "git config --local --get user.email",
+    "set global-user.email": "git config --global user.email \"{}\"",
+    "set local-user.email": "git config --local user.email \"{}\"",
+    "git-init":"git init",
+}
+
+def findgitrepos(rootdir=reporootdir):
+    gitrepos = []
+    for root, dirs, files in os.walk(rootdir, topdown=True):
+        if ".git" in dirs and root.endswith("-git"):
+            relativepath = root.replace(rootdir + "/", "")
+            gitrepos.append(relativepath)
+            dirs[:] = []
+    return gitrepos
+
+
+def findallgitrepos(rootdir=reporootdir):
+    gitrepos = []
+    for root, dirs, files in os.walk(rootdir, topdown=True):
+        if ".git" in dirs:
+            gitrepos.append(root) 
+            dirs[:] = []
+    return gitrepos
+
+
+def getoldreposinfo(repolistfile):
+    oldreposinfo = []
+    with open(repolistfile) as f:
+        oldreposinfo = eval(f.read())
+
+    return oldreposinfo
+
+
+
+def addnewreposinfo(oldreposinfo, currrepodirs):
+    newrepodirs = []
+    updatedreposinfo = oldreposinfo
+
+    oldrepodirs = [repoinfo["dir"] for repoinfo in oldreposinfo]
+
+    for repodir in currrepodirs:
+        if repodir not in oldrepodirs:
+            newrepodirs.append(repodir)
+
+    for repodir in newrepodirs:
+        d = {"dir":repodir, "origin-url":"", "user.name":"", "user.email":"","type":"git"}
+        updatedreposinfo.append(d)
+
+    return updatedreposinfo
+
+
+def updateinfo():
+    """
+    Note: this function never deletes info of a git directory. To delete, do it maually (with caution of course) by deleting the corresponding line in the gitdirlist file (whereever it may be).
+    """
+
+    oldreposinfo = getoldreposinfo(repolistfile)
+    currrepodirs = findgitrepos()
+
+    updatedreposinfo = addnewreposinfo(oldreposinfo, currrepodirs)
+
+    for repoinfo in updatedreposinfo:
+        repoabsdir = osp.join(reporootdir, repoinfo["dir"])
+
+        os.makedirs(repoabsdir, exist_ok=True)
+
+        os.chdir(repoabsdir)
+
+
+
+if __name__ == "__main__":
+    if len(sys.argv) > 2:
+        print(usagehelpmsg, file=sys.stderr)
+        exit(1)
+
+    rootdir = subcmd = gitrepos = None
+    if len(sys.argv) == 1:
+        gitrepos = findgitrepos()
+        print(os.linesep.join(gitrepos))
+        exit(0)
+
+    if len(sys.argv) == 2:
+        subcmd = sys.argv[1].strip().lower()
+        if subcmd == "list":
+            gitrepos = findgitrepos()
+            print(os.linesep.join(gitrepos))
+        elif subcmd == "listall":
+            gitrepos = findallgitrepos()
+            print(os.linesep.join(gitrepos))
+        elif subcmd == "updateinfo":
+            updateinfo()
+        exit(0)
+
+    print(usagehelpmsg, file=sys.stderr)
+    exit(1)
+
+
