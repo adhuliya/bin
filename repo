@@ -29,6 +29,7 @@ Default search root directory is "{reporootdir}".
 cmd = {
     "get origin-url":"git remote get-url origin",
     "set origin-url": "git remote add origin {}",
+    "remove origin-url": "git remote remove origin",
     "get global-user.name": "git config --global --get user.name",
     "get local-user.name": "git config --local --get user.name",
     "set global-user.name": "git config --global user.name \"{}\"",
@@ -111,6 +112,13 @@ def updateinfo():
             print("$> ALREADY A GIT REPO")
             if repoinfo["origin-url"]:
                 print("$> Set origin-url")
+
+                command = cmd["remove origin-url"]
+                cp = sub.run(command, shell=True)
+                if cp.returncode:
+                    errdirs.append(repoabsdir)
+                    print("$> Return Code : {}".format(cp.returncode))
+
                 command = cmd["set origin-url"].format(repoinfo["origin-url"])
                 print("$> {}".format(command))
                 cp = sub.run(command, shell=True)
