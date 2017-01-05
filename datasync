@@ -2,27 +2,13 @@
 
 import subprocess as sub
 import os
+import os.path as osp
 import sys
 
-# list of directories having git repository
-gitdirs = [
-"/home/codeman/mydata/git/bin-git",
-"/home/codeman/mydata/git/configs-git",
-"/home/codeman/mydata/git/mynotes-git",
-"/home/codeman/mydata/git/research/misc-git",
-"/home/codeman/mydata/git/research/meetings-git",
-"/home/codeman/mydata/git/research/resources-git",
-"/home/codeman/mydata/git/research/code/benchmarks-git",
-"/home/codeman/mydata/git/research/code/cs618project-git",
-"/home/codeman/mydata/git/research/writeups/mandar-report-git",
-"/home/codeman/mydata/git/research/writeups/mywriteups-git",
-"/home/codeman/mydata/git/research/writeups/research-notes-git",
-"/home/codeman/mydata/git/research/writeups/cs618-project-report-git",
-"/home/codeman/mydata/git/ws/gate-notes-git",
-"/home/codeman/mydata/git/ws/web-filebrowser-git",
-"/home/codeman/mydata/git/ws/web-organizer-git",
-"/home/codeman/mydata/git/ws/llvm-clang-git",
-]
+
+mydata = "/home/codeman/mydata"
+reporootdir = mydata + "/git"
+repolistfile = reporootdir + "/configs-git/mydata-data/repositories.pylist"
 
 gitcommands = [
 """git add --all""",
@@ -32,20 +18,43 @@ gitcommands = [
 """git push origin master""",
 ]
 
+
+def getoldreposinfo():
+    oldreposinfo = []
+    with open(repolistfile) as f:
+        content = f.read()
+        if content.strip():
+            oldreposinfo = eval(content)
+
+    return oldreposinfo
+
+
+def getrepodirs():
+    repodirs = []
+    reposinfo = getoldreposinfo()
+
+    for repoinfo in reposinfo:
+        repodirs.append(osp.join(reporootdir, repoinfo["dir"]))
+
+    return repodirs
+
+
 def syncall():
     errdirs = []
     tmperr = 0
-    for dir in gitdirs:
+
+    repodirs = getrepodirs()
+    for dirpath in repodirs:
         tmperr = 0
-        print(os.linesep, "$>>> ", dir, os.linesep, sep="")
+        print(os.linesep, "$>>> ", dirpath, os.linesep, sep="")
 
         try:
-            os.chdir(dir)
+            os.chdir(dirpath)
         except FileNotFoundError as e:
             print("DIRECTORY NOT FOUND", file=sys.stderr)
-            print(os.linesep, "ERROR!!", file=sys.stderr)
+            print(os.linesep, "ERROR!!", file=sys.stderr, sep="")
             # tmperr = 1
-            errdirs.append(dir)
+            errdirs.append(dirpath)
             continue
 
         for cmd in gitcommands:
@@ -61,14 +70,14 @@ def syncall():
         if tmperr == 0:
             print("SUCCESS")
         else:
-            errdirs.append(dir)
+            errdirs.append(dirpath)
             print("ERROR!!", file=sys.stderr)
 
     return errdirs
 
 
 if __name__ == "__main__":
-    print(os.linesep, "PYTHON SCRIPT STARTED")
+    print(os.linesep, "PYTHON SCRIPT STARTED", sep="")
     errdirs = syncall()
     if errdirs:
         print("Error Dirs:", os.linesep, errdirs, file=sys.stderr)
