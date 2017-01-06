@@ -108,6 +108,7 @@ if __name__ == "__main__":
                 print(os.linesep, "{} ERRORS".format(len(errdirs)), os.linesep, sep="", file=sys.stderr)
             else:
                 print(os.linesep, "SUCCESS. :)", os.linesep, sep="")
+            exit(0)
         else:
             print(usagemsg, file=sys.stderr)
             exit(1)
