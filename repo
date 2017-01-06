@@ -56,9 +56,19 @@ def findallgitrepos(rootdir=reporootdir):
     gitrepos = []
     for root, dirs, files in os.walk(rootdir, topdown=True):
         if ".git" in dirs:
-            gitrepos.append(root) 
+            relativepath = root.replace(rootdir + "/", "")
+            gitrepos.append(relativepath)
             dirs[:] = []
     return gitrepos
+
+
+def removedeadreposinfo(oldreposinfo):
+    livereposinfo = []
+    for repoinfo in oldreposinfo:
+        if repoinfo["live"]:
+            livereposinfo.append(repoinfo)
+
+    return livereposinfo
 
 
 def getoldreposinfo(repolistfile):
@@ -71,10 +81,9 @@ def getoldreposinfo(repolistfile):
     return oldreposinfo
 
 
-
 def addnewreposinfo(oldreposinfo, currrepodirs):
     newrepodirs = []
-    updatedreposinfo = oldreposinfo
+    updatedreposinfo = removedeadreposinfo(oldreposinfo)
 
     oldrepodirs = [repoinfo["dir"] for repoinfo in oldreposinfo]
 
@@ -83,7 +92,7 @@ def addnewreposinfo(oldreposinfo, currrepodirs):
             newrepodirs.append(repodir)
 
     for repodir in newrepodirs:
-        d = {"dir":repodir, "origin-url":"", "user.name":"", "user.email":""}
+        d = {"dir":repodir, "origin-url":"", "user.name":"", "user.email":"", "live":True}
         updatedreposinfo.append(d)
 
     return updatedreposinfo
@@ -206,9 +215,11 @@ if __name__ == "__main__":
         if subcmd == "list":
             gitrepos = findgitrepos()
             print(os.linesep.join(gitrepos))
+            print(os.linesep, len(gitrepos), sep="")
         elif subcmd == "listall":
             gitrepos = findallgitrepos()
             print(os.linesep.join(gitrepos))
+            print(os.linesep, len(gitrepos), sep="")
         elif subcmd == "update":
             updateinfo()
         else:

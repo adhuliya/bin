@@ -24,6 +24,14 @@ core: only sync bin-git and configs-git
 
 """
 
+def removedeadreposinfo(oldreposinfo):
+    livereposinfo = []
+    for repoinfo in oldreposinfo:
+        if repoinfo["live"]:
+            livereposinfo.append(repoinfo)
+
+    return livereposinfo
+
 
 def getoldreposinfo():
     oldreposinfo = []
@@ -32,7 +40,7 @@ def getoldreposinfo():
         if content.strip():
             oldreposinfo = eval(content)
 
-    return oldreposinfo
+    return removedeadreposinfo(oldreposinfo)
 
 
 def getrepodirs():
