@@ -97,6 +97,14 @@ def addnewreposinfo(oldreposinfo, currrepodirs):
 
     return updatedreposinfo
 
+def writereposinfo(reposinfo, filename=repolistfile):
+    with open(filename, "w") as f:
+        f.write("["+os.linesep)
+        for repoinfo in reposinfo:
+            f.write("{},{}".format(repoinfo,os.linesep))
+
+        f.write("]")
+
 
 def updateinfo():
     """
@@ -190,13 +198,28 @@ def updateinfo():
             repoinfo["user.email"] = name
 
 
-    with open(repolistfile, "w") as f:
-        f.write(repr(updatedreposinfo))
+    writereposinfo(updatedreposinfo)
 
     if errdirs:
         print("$> Error Dirs:")
         print("$>", errdirs)
         print(os.linesep, "{} ERRORS".format(len(errdirs)), os.linesep)
+
+def printdeadrepos():
+    oldreposinfo = getoldreposinfo(repolistfile)
+    count = 0
+    for repoinfo in oldreposinfo:
+        if not repoinfo["live"]:
+            printrepoinfo(repoinfo)
+            count += 1
+    print("Total :", count)
+
+
+def printrepoinfo(repoinfo):
+    print(os.linesep, "$>>> ", repoinfo["dir"], os.linesep, sep="")
+    print("origin-url :", repoinfo["origin-url"])
+    print("user.name  :", repoinfo["user.name"])
+    print("user.email :", repoinfo["user.email"])
 
 
 if __name__ == "__main__":
@@ -222,6 +245,8 @@ if __name__ == "__main__":
             print(os.linesep, len(gitrepos), sep="")
         elif subcmd == "update":
             updateinfo()
+        elif subcmd == "dead":
+            printdeadrepos()
         else:
             print(usagehelpmsg, file=sys.stderr)
             exit(2)
