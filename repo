@@ -101,7 +101,7 @@ def writereposinfo(reposinfo, filename=repolistfile):
     with open(filename, "w") as f:
         f.write("["+os.linesep)
         for repoinfo in reposinfo:
-            f.write("{},{}".format(repoinfo,os.linesep))
+            f.write("{},{}".format(repr(repoinfo),os.linesep))
 
         f.write("]")
 
