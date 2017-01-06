@@ -18,6 +18,12 @@ gitcommands = [
 """git push origin master""",
 ]
 
+usagemsg = """Usage: datasync [core]
+
+core: only sync bin-git and configs-git
+
+"""
+
 
 def getoldreposinfo():
     oldreposinfo = []
@@ -39,11 +45,13 @@ def getrepodirs():
     return repodirs
 
 
-def syncall():
+def syncall(repodirs=None):
     errdirs = []
     tmperr = 0
 
-    repodirs = getrepodirs()
+    if not repodirs:
+        repodirs = getrepodirs()
+
     for dirpath in repodirs:
         tmperr = 0
         print(os.linesep, "$>>> ", dirpath, os.linesep, sep="")
@@ -76,7 +84,35 @@ def syncall():
     return errdirs
 
 
+def synccore():
+    repodirs = getrepodirs()
+
+    coredirs = []
+    for repodir in repodirs:
+        if repodir.endswith("bin-git") or repodir.endswith("configs-git"):
+            coredirs.append(repodir)
+
+    return syncall(coredirs)
+
+
 if __name__ == "__main__":
+    if len(sys.argv) > 2:
+        print(usagemsg, file=sys.stderr)
+        exit(1)
+
+    if len(sys.argv) == 2:
+        if sys.argv[1].strip().lower() == "core":
+            errdirs = synccore()
+            if errdirs:
+                print("Error Dirs:", os.linesep, errdirs, file=sys.stderr)
+                print(os.linesep, "{} ERRORS".format(len(errdirs)), os.linesep, sep="", file=sys.stderr)
+            else:
+                print(os.linesep, "SUCCESS. :)", os.linesep, sep="")
+        else:
+            print(usagemsg, file=sys.stderr)
+            exit(1)
+
+
     print(os.linesep, "PYTHON SCRIPT STARTED", sep="")
     errdirs = syncall()
     if errdirs:
