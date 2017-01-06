@@ -123,6 +123,7 @@ def updateinfo():
             print("$> Set origin-url")
 
             command = cmd["remove origin-url"]
+            print("$> {}".format(command))
             cp = sub.run(command, shell=True)
             if cp.returncode:
                 errdirs.append(repoabsdir)
