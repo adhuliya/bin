@@ -73,10 +73,11 @@ def removedeadreposinfo(oldreposinfo):
 
 def getoldreposinfo(repolistfile):
     oldreposinfo = []
-    with open(repolistfile) as f:
-        content = f.read()
-        if content.strip():
-            oldreposinfo = eval(content)
+    if os.path.exists(repolistfile):
+        with open(repolistfile) as f:
+            content = f.read()
+            if content.strip():
+                oldreposinfo = eval(content)
 
     return oldreposinfo
 
@@ -92,7 +93,7 @@ def addnewreposinfo(oldreposinfo, currrepodirs):
             newrepodirs.append(repodir)
 
     for repodir in newrepodirs:
-        d = {"dir":repodir, "origin-url":"", "user.name":"", "user.email":"", "live":True}
+        d = {"groups":["all"], "dir":repodir, "origin-url":"", "user.name":"", "user.email":"", "live":True}
         updatedreposinfo.append(d)
 
     return updatedreposinfo
