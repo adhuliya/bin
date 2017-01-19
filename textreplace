@@ -1,0 +1,67 @@
+#!/usr/bin/env python3
+
+import os
+import os.path as osp
+import re
+#import mimetypes as mime
+import sys
+
+usagemsg = """
+textreplace <from> <to> [file extensions]
+
+from, to: the python3 regular expression
+file extensions: filters files
+
+"""
+
+def change(before, after, fileext=[".txt"]):
+    for dirpath,dirs,files in os.walk("."):
+      for filename in files:
+        fullname = osp.join(dirpath, filename)
+        # mtype = mime.guess_type(fullname)
+        # if mtype and mtype[0] and mtype[0].startswith('text'):
+        for ext in fileext:
+            if fullname.endswith(ext):
+                changeinfile(fullname, before, after)
+                break
+
+def changeinfile(fullname, before, after):
+    print("Reading:", fullname)
+    content = ""
+    with open(fullname) as f:
+      content = f.read()
+
+    newcontent = re.sub(before, after, content)
+
+    if newcontent != content:
+        print("  Changed.")
+    else:
+        print("  Unchanged.")
+
+    with open(fullname, "w") as f:
+      f.write(newcontent)
+
+
+if __name__ == "__main__":
+    if len(sys.argv) < 3:
+        print(usagemsg, file=sys.stderr)
+        exit(1)
+
+    before = sys.argv[1]
+    after = sys.argv[2]
+
+    fileext = sys.argv[3:]
+
+    dotprefixedfileext = []
+    for ext in fileext:
+        if not ext.startswith("."):
+            dotprefixedfileext.append("." + ext)
+        else:
+            dotprefixedfileext.append(ext)
+
+    if dotprefixedfileext:
+        change(before, after, dotprefixedfileext)
+    else:
+        change(before, after)
+
+
