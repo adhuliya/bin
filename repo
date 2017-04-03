@@ -62,6 +62,16 @@ def findallgitrepos(rootdir=reporootdir):
     return gitrepos
 
 
+def findToBeSetupGitRepos(rootdir=reporootdir):
+    gitrepos = []
+    for root, dirs, files in os.walk(rootdir, topdown=True):
+        if root.endswith("-git") and ".git" not in dirs:
+            relativepath = root.replace(rootdir + "/", "")
+            gitrepos.append(relativepath)
+            dirs[:] = []
+    return gitrepos
+
+
 def removedeadreposinfo(oldreposinfo):
     livereposinfo = []
     for repoinfo in oldreposinfo:
@@ -242,6 +252,10 @@ if __name__ == "__main__":
             print(os.linesep, len(gitrepos), sep="")
         elif subcmd == "listall":
             gitrepos = findallgitrepos()
+            print(os.linesep.join(gitrepos))
+            print(os.linesep, len(gitrepos), sep="")
+        elif subcmd == "tosetup":
+            gitrepos = findToBeSetupGitRepos()
             print(os.linesep.join(gitrepos))
             print(os.linesep, len(gitrepos), sep="")
         elif subcmd == "update":
