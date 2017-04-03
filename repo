@@ -94,7 +94,10 @@ def getoldreposinfo(repolistfile):
 
 def addnewreposinfo(oldreposinfo, currrepodirs):
     newrepodirs = []
-    updatedreposinfo = removedeadreposinfo(oldreposinfo)
+    # don't delete dead repos : let their information remain
+    # updatedreposinfo = removedeadreposinfo(oldreposinfo)
+
+    updatedreposinfo = oldreposinfo
 
     oldrepodirs = [repoinfo["dir"] for repoinfo in oldreposinfo]
 
@@ -103,7 +106,7 @@ def addnewreposinfo(oldreposinfo, currrepodirs):
             newrepodirs.append(repodir)
 
     for repodir in newrepodirs:
-        d = {"groups":["all"], "dir":repodir, "origin-url":"", "user.name":"", "user.email":"", "live":True}
+        d = {"groups":["all"], "dir":repodir, "origin-url":"", "user.name":"", "user.email":"", "live":True, "readonly":False}
         updatedreposinfo.append(d)
 
     return updatedreposinfo
@@ -114,21 +117,24 @@ def writereposinfo(reposinfo, filename=repolistfile):
         for repoinfo in reposinfo:
             f.write("{},{}{}".format(repr(repoinfo),os.linesep,os.linesep))
 
-        f.write("]")
+        f.write("]{}".format(os.linesep*2))
 
 
 def updateinfo():
     """
-    Note: this function never deletes info of a git directory. To delete, do it maually (with caution of course) by deleting the corresponding line in the gitdirlist file (whereever it may be). And deleting all corresponding direcotries on different machines.
+    Note: this function never deletes info of a git directory. To delete/modify, do it maually (with caution of course) by modifying the corresponding line in the repository info file (whereever it may be). And deleting all corresponding direcotries on different machines.
     """
     errdirs = []
 
     oldreposinfo = getoldreposinfo(repolistfile)
-    currrepodirs = findgitrepos()
+    currrepodirs = findallgitrepos()
 
     updatedreposinfo = addnewreposinfo(oldreposinfo, currrepodirs)
 
     for repoinfo in updatedreposinfo:
+        if not repoinfo["live"]:
+            continue
+
         repoabsdir = osp.join(reporootdir, repoinfo["dir"])
 
         os.makedirs(repoabsdir, exist_ok=True)
@@ -146,6 +152,11 @@ def updateinfo():
             if cp.returncode:
                 errdirs.append(repoabsdir)
                 print("$> Return Code : {}".format(cp.returncode))
+
+        if repoinfo["dir"].endswith("-git"):
+            repoinfo["readonly"] = False
+        else:
+            repoinfo["readonly"] = True
 
         if repoinfo["origin-url"]:
             print("$> Set origin-url")

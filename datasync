@@ -18,6 +18,10 @@ gitcommands = [
 """git push origin master""",
 ]
 
+readonlygitcommands = [
+"""git fetch --prune""",
+]
+
 usagemsg = """Usage: datasync [core]
 
 core: only sync bin-git and configs-git
@@ -83,7 +87,14 @@ def syncall(repodirs):
             errdirs.append(dirpath)
             continue
 
-        for cmd in gitcommands:
+        selectedgitcommands = None
+        if dirpath.endswith("-git"):
+            selectedgitcommands = gitcommands
+        else:
+            selectedgitcommands = readonlygitcommands
+
+
+        for cmd in selectedgitcommands:
             print("$>", cmd)
             cp = sub.run(cmd, shell=True)
             if cp.returncode:
@@ -118,9 +129,10 @@ if __name__ == "__main__":
             groups.append(group.strip().lower())
 
         reposinfo = filterbygroup(reposinfo, groups)
-        if not reposinfo:
-            print("NO REPOS MATCH SELECTION. EXITING")
-            exit(1)
+
+    if not reposinfo:
+        print("NO REPOS MATCH SELECTION. EXITING")
+        exit(1)
 
     repodirs = getrepodirs(reposinfo)
     errdirs = syncall(repodirs)
