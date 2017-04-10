@@ -5,7 +5,7 @@ cd $DIR
 echo -e "\n$>>> $DIR\n"
 git add --all
 
-if [ "$1" == ""]; then
+if [ "$1" == "" ]; then
     git commit -m 'semiautomated-update'
 else
     git commit -m "$1"
