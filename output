@@ -9,9 +9,9 @@ def output(size, unit):
   times = size
   # Converting units to KB
   if unit == "G" or unit == "g":
-    times *= 2**20
+    times <<= 20
   elif unit == "M" or unit == "m":
-    times *= 2**10
+    times <<= 10
   elif unit == "K" or unit == "k":
     times *= 1
   else:

@@ -17,15 +17,18 @@ file extensions: filters files
 def change(before, after, fileext=[".txt"]):
     for dirpath,dirs,files in os.walk("."):
       for filename in files:
-        fullname = osp.join(dirpath, filename)
-        # mtype = mime.guess_type(fullname)
-        # if mtype and mtype[0] and mtype[0].startswith('text'):
+
         for ext in fileext:
-            if fullname.endswith(ext):
+            if filename.endswith(ext):
+                fullname = osp.join(dirpath, filename)
                 changeinfile(fullname, before, after)
                 break
 
+
 def changeinfile(fullname, before, after):
+    """
+    Read file, replace/substitute, write updated content.
+    """
     print("Reading:", fullname)
     content = ""
     with open(fullname) as f:
@@ -42,6 +45,22 @@ def changeinfile(fullname, before, after):
       f.write(newcontent)
 
 
+def dotprefixfileext(fileext):
+    """
+    Prefix file extensions with a dot '.'
+    """
+    if not fileext: return None
+
+    dotprefixfileext = []
+    for ext in fileext:
+        if not ext.strip().startswith("."):
+            dotprefixedfileext.append("." + ext.strip())
+        else:
+            dotprefixedfileext.append(ext.strip())
+
+    return dotprefixedfileext
+
+
 if __name__ == "__main__":
     if len(sys.argv) < 3:
         print(usagemsg, file=sys.stderr)
@@ -52,12 +71,7 @@ if __name__ == "__main__":
 
     fileext = sys.argv[3:]
 
-    dotprefixedfileext = []
-    for ext in fileext:
-        if not ext.startswith("."):
-            dotprefixedfileext.append("." + ext)
-        else:
-            dotprefixedfileext.append(ext)
+    dotprefixedfileext = dotprefixfileext(fileext)
 
     if dotprefixedfileext:
         change(before, after, dotprefixedfileext)

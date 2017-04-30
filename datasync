@@ -6,7 +6,7 @@ import os.path as osp
 import sys
 
 
-mydata = "/home/codeman/mydata"
+mydata = os.environ["MYDATA"] or "/home/codeman/mydata"
 reporootdir = mydata + "/git"
 repolistfile = reporootdir + "/configs-git/mydata-data/repositories.pylist"
 
@@ -38,7 +38,7 @@ def filterbygroup(reposinfo, groups=["all"]):
     return filteredreposinfo
 
 
-def removedeadrepoinfo(reposinfo):
+def filterdeadrepos(reposinfo):
     livereposinfo = []
     for repoinfo in reposinfo:
         if repoinfo["live"]:
@@ -62,7 +62,7 @@ def getrepodirs(reposinfo=None):
     repodirs = []
     if not reposinfo:
         reposinfo = getreposinfo()
-        reposinfo = removedeadrepoinfo(reposinfo)
+        reposinfo = filterdeadrepos(reposinfo)
 
     for repoinfo in reposinfo:
         repodirs.append(osp.join(reporootdir, repoinfo["dir"]))
@@ -113,22 +113,23 @@ def syncall(repodirs):
 
     return errdirs
 
+def scangroups(argv):
+    groups = []
+    if len(argv) == 1:
+        groups = ["all"] # sync all dirs in repodirs
+    else:
+        groups = [g.strip().lower() for g in sys.argv[1:]]
+
+    return groups
+
 
 if __name__ == "__main__":
 
-    reposinfo= removedeadrepoinfo(getreposinfo())
-    errdirs = []
+    reposinfo = filterdeadrepos(getreposinfo())
 
+    groups = scangroups(sys.argv)
 
-    if len(sys.argv) == 1:
-        # sync all dirs in repodirs
-        pass
-    else:
-        groups = []
-        for group in sys.argv[1:]:
-            groups.append(group.strip().lower())
-
-        reposinfo = filterbygroup(reposinfo, groups)
+    reposinfo = filterbygroup(reposinfo, groups)
 
     if not reposinfo:
         print("NO REPOS MATCH SELECTION. EXITING")
