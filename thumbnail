@@ -1,0 +1,15 @@
+#!/bin/bash
+
+mkdir thumbnail1234
+
+for img in *.jpg; do
+    w=`identify -format '%w' $img`
+    h=`identify -format '%h' $img`
+    if [ $w -lt $h ]; then
+        convert -thumbnail 720 $img thumbnail1234/thumb.$img;
+    else
+        convert -thumbnail 1280 $img thumbnail1234/thumb.$img;
+    fi
+done
+
+
