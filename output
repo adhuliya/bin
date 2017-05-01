@@ -4,6 +4,7 @@ import sys
 import re
 
 onekb = "data" * 256
+filename = "garbage.output"
 
 def output(size, unit):
   times = size
@@ -17,8 +18,12 @@ def output(size, unit):
   else:
     print("Error: Wrong suffix:", unit)
 
-  for i in range(times):
-    print(onekb, end="")
+  with open(filename, "w") as f:
+      a = f.seek((times << 10)-1, 0)
+      print(a)
+      #a = f.seek(-2,2)
+      #print(a)
+      f.write("A")
 
 
 def process(size):
