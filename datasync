@@ -98,8 +98,8 @@ def syncall(repodirs):
             print("$>", cmd)
             cp = sub.run(cmd, shell=True)
             if cp.returncode:
-                print("$>", "ReturnCode :", cp.returncode)
-            if cmd.find(" commit ") >= 0 and cp.returncode == 1:
+                print("$> ReturnCode :", cp.returncode)
+            if cp.returncode == 1 and cmd.find(" commit ") >= 0:
                 pass
             elif cp.returncode != 0:
                 tmperr = 1
@@ -112,6 +112,7 @@ def syncall(repodirs):
             print("ERROR!!", file=sys.stderr)
 
     return errdirs
+
 
 def scangroups(argv):
     groups = []
