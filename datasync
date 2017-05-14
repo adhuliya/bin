@@ -22,9 +22,9 @@ readonlygitcommands = [
 """git fetch --prune""",
 ]
 
-usagemsg = """Usage: datasync [core]
+usagemsg = """Usage: datasync [<group_name> [, <group_name> [...]]
 
-core: only sync bin-git and configs-git
+group_name: only sync repos in 'group_name'
 
 """
 
@@ -45,6 +45,19 @@ def filterdeadrepos(reposinfo):
             livereposinfo.append(repoinfo)
 
     return livereposinfo
+
+
+def filterbypath(reposinfo, pathSubString="someRandomString"):
+    """
+    Filters out repoinfo's which have the 'pathSubString' in their
+    directory path.
+    """
+    filteredreposinfo = []
+    for repoinfo in reposinfo:
+        if pathSubString in repoinfo["dir"]:
+            filteredreposinfo.append(repoinfo)
+
+    return filteredreposinfo
 
 
 def getreposinfo(filename=repolistfile):
