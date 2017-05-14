@@ -145,7 +145,7 @@ def writereposinfo(reposinfo, filename=repolistfile):
         # Use only string keys, as keys are sorted for printing
         # Note: The file contents are read using builtins.eval()
         """) + (os.linesep*2))
-        f.write("["+os.linesep)
+        f.write("["+(os.linesep*2))
         for repoinfo in reposinfo:
             f.write("{},{}".format(dictRepr(repoinfo),(os.linesep*2)))
 
