@@ -8,11 +8,13 @@ import sys, os
 import os.path as osp
 import re
 import subprocess as sub
+from io import StringIO
+from textwrap import dedent
 
 
-mydata = "/home/codeman/mydata"
-reporootdir = mydata + "/git"
-repolistfile = reporootdir + "/configs-git/mydata-data/repositories.pylist"
+mydata = os.environ.get("MYDATA", "/home/codeman/mydata")
+reporootdir = osp.join(mydata, "git")
+repolistfile = osp.join(reporootdir, "configs-git/mydata-data/repositories.pylist")
 
 usagehelpmsg = """Usage: gitrepo [list|listall|update]
 
@@ -93,9 +95,11 @@ def getoldreposinfo(repolistfile):
 
 
 def addnewreposinfo(oldreposinfo, currrepodirs):
+    """
+    Adds newly discovered repo's directory and other info.
+    All other info except the directory are set to default.
+    """
     newrepodirs = []
-    # don't delete dead repos : let their information remain
-    # updatedreposinfo = removedeadreposinfo(oldreposinfo)
 
     updatedreposinfo = oldreposinfo
 
@@ -106,18 +110,46 @@ def addnewreposinfo(oldreposinfo, currrepodirs):
             newrepodirs.append(repodir)
 
     for repodir in newrepodirs:
-        d = {"groups":["all"], "dir":repodir, "origin-url":"", "user.name":"", "user.email":"", "live":True, "readonly":False}
+        d = {
+                "groups": ["all"],
+                "dir": repodir,
+                "origin-url": "",
+                "user.name": "",
+                "user.email": "",
+                "live": True,
+                "readonly": False,
+                }
         updatedreposinfo.append(d)
 
     return updatedreposinfo
 
+
+def dictRepr(d):
+    dict_repr = ""
+    with StringIO() as sio:
+        sio.write("{\n")
+        for key in sorted(d):
+            sio.write("  {: <14}: {!r},\n".format(repr(key),d[key]))
+        sio.write("}")
+        dict_repr = sio.getvalue()
+    return dict_repr
+
+
 def writereposinfo(reposinfo, filename=repolistfile):
+    reposinfo.sort(key=lambda x: x["dir"])
+
     with open(filename, "w") as f:
+        f.write(dedent(
+        """\
+        # format: List of Python 3 Dicts.
+        # Use only string keys, as keys are sorted for printing
+        # Note: The file contents are read using builtins.eval()
+        """) + (os.linesep*2))
         f.write("["+os.linesep)
         for repoinfo in reposinfo:
-            f.write("{},{}{}".format(repr(repoinfo),os.linesep,os.linesep))
+            f.write("{},{}".format(dictRepr(repoinfo),(os.linesep*2)))
 
-        f.write("]{}".format(os.linesep*2))
+        f.write("]{}".format(os.linesep*3))
 
 
 def updateinfo():
@@ -132,6 +164,8 @@ def updateinfo():
     updatedreposinfo = addnewreposinfo(oldreposinfo, currrepodirs)
 
     for repoinfo in updatedreposinfo:
+        newrepo = False
+
         if not repoinfo["live"]:
             continue
 
@@ -152,6 +186,7 @@ def updateinfo():
             if cp.returncode:
                 errdirs.append(repoabsdir)
                 print("$> Return Code : {}".format(cp.returncode))
+            newrepo = True
 
         if repoinfo["dir"].endswith("-git"):
             repoinfo["readonly"] = False
@@ -159,14 +194,18 @@ def updateinfo():
             repoinfo["readonly"] = True
 
         if repoinfo["origin-url"]:
+            if newrepo:
+                print("$> FRESH REPO SETUP")
+
             print("$> Set origin-url")
 
-            command = cmd["remove origin-url"]
-            print("$> {}".format(command))
-            cp = sub.run(command, shell=True)
-            if cp.returncode:
-                errdirs.append(repoabsdir)
-                print("$> Return Code : {}".format(cp.returncode))
+            if not newrepo:
+                command = cmd["remove origin-url"]
+                print("$> {}".format(command))
+                cp = sub.run(command, shell=True)
+                if cp.returncode:
+                    errdirs.append(repoabsdir)
+                    print("$> Return Code : {}".format(cp.returncode))
 
             command = cmd["set origin-url"].format(repoinfo["origin-url"])
             print("$> {}".format(command))
@@ -226,6 +265,7 @@ def updateinfo():
         print("$> Error Dirs:")
         print("$>", errdirs)
         print(os.linesep, "{} ERRORS".format(len(errdirs)), os.linesep)
+
 
 def printdeadrepos():
     oldreposinfo = getoldreposinfo(repolistfile)
