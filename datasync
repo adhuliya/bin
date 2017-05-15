@@ -6,11 +6,11 @@ import os.path as osp
 import sys
 
 
-mydata = os.environ["MYDATA"] or "/home/codeman/mydata"
-reporootdir = mydata + "/git"
-repolistfile = reporootdir + "/configs-git/mydata-data/repositories.pylist"
+myData = os.environ["MYDATA"] or "/home/codeman/mydata"
+repoRootDir = myData + "/git"
+repoListFile = repoRootDir + "/configs-git/mydata-data/repositories.pylist"
 
-gitcommands = [
+gitCommands = [
 """git add --all""",
 """git commit -m 'automated-update'""",
 """git fetch origin master""",
@@ -18,77 +18,87 @@ gitcommands = [
 """git push origin master""",
 ]
 
-readonlygitcommands = [
+readOnlyGitCommands = [
 """git fetch --prune""",
 ]
 
-usagemsg = """Usage: datasync [<group_name> [, <group_name> [...]]
+usageMsg = """Usage: datasync [<groupName> [, <groupName> [...]]
 
-group_name: only sync repos in 'group_name'
+groupName: only sync repos in 'group_name', default is 'all' live repos.
 
 """
 
-def filterbygroup(reposinfo, groups=["all"]):
-    filteredreposinfo = []
-    for repoinfo in reposinfo:
-        for repogrp in repoinfo["groups"]:
-            if repogrp in groups:
-                filteredreposinfo.append(repoinfo)
-
-    return filteredreposinfo
-
-
-def filterdeadrepos(reposinfo):
-    livereposinfo = []
-    for repoinfo in reposinfo:
-        if repoinfo["live"]:
-            livereposinfo.append(repoinfo)
-
-    return livereposinfo
-
-
-def filterbypath(reposinfo, pathSubString="someRandomString"):
+def filterByGroup(repos, groups=["all"]):
     """
-    Filters out repoinfo's which have the 'pathSubString' in their
+    Filters out all repoInfos from repos, not belonging to the given groups.
+    """
+    filteredReposInfo = []
+    for repo in repos:
+        for repoGroup in repo["groups"]:
+            if repoGroup in groups:
+                filteredReposInfo.append(repo)
+
+    return filteredReposInfo
+
+
+def filterDeadRepos(repos):
+    """
+    Filters out all the 'dead' repoInfos from repos.
+    """
+    liveReposInfo = []
+    for repo in repos:
+        if repo["live"]:
+            liveReposInfo.append(repo)
+
+    return liveReposInfo
+
+
+def filterByPath(repos, pathSubString=None):
+    """
+    Filters out repoInfos from repos, which have the 'pathSubString' in their
     directory path.
+    Possible future use.
     """
-    filteredreposinfo = []
-    for repoinfo in reposinfo:
-        if pathSubString in repoinfo["dir"]:
-            filteredreposinfo.append(repoinfo)
+    if pathSubString is None:
+        return repos
 
-    return filteredreposinfo
+    filteredReposInfo = []
+    for repo in repos:
+        if pathSubString in repo["dir"]:
+            filteredReposInfo.append(repo)
+
+    return filteredReposInfo
 
 
-def getreposinfo(filename=repolistfile):
-    """ read the repoinfo from file """
-    reposinfo = []
+def readReposInfoFile(filename=repoListFile):
+    """ read the repoInfos from the given file """
+    repos = []
     with open(filename) as f:
         content = f.read()
         if content.strip():
-            reposinfo = eval(content)
+            repos = eval(content)
 
-    return reposinfo
-
-
-def getrepodirs(reposinfo=None):
-    repodirs = []
-    if not reposinfo:
-        reposinfo = getreposinfo()
-        reposinfo = filterdeadrepos(reposinfo)
-
-    for repoinfo in reposinfo:
-        repodirs.append(osp.join(reporootdir, repoinfo["dir"]))
-
-    return repodirs
+    return repos
 
 
-def syncall(repodirs):
-    errdirs = []
-    tmperr = 0
+def getRepoDirs(repos=None):
+    repoDirs = []
+    if not repos:
+        repos = readReposInfoFile()
+        repos = filterDeadRepos(repos)
 
-    for dirpath in repodirs:
-        tmperr = 0
+    for repo in repos:
+        repoDirs.append(osp.join(repoRootDir, repo["dir"]))
+
+    return repoDirs
+
+
+def syncAll(repoDirs):
+    errDirs = []
+    tmpErr = 0
+
+    for dirpath in repoDirs:
+        tmpErr = 0
         print(os.linesep, "$>>> ", dirpath, os.linesep, sep="")
 
         try:
@@ -96,18 +106,18 @@ def syncall(repodirs):
         except FileNotFoundError as e:
             print("DIRECTORY NOT FOUND", file=sys.stderr)
             print(os.linesep, "ERROR!!", file=sys.stderr, sep="")
-            # tmperr = 1
-            errdirs.append(dirpath)
+            # tmpErr = 1
+            errDirs.append(dirpath)
             continue
 
-        selectedgitcommands = None
+        selectedGitCommands = None
         if dirpath.endswith("-git"):
-            selectedgitcommands = gitcommands
+            selectedGitCommands = gitCommands
         else:
-            selectedgitcommands = readonlygitcommands
+            selectedGitCommands = readOnlyGitCommands
 
 
-        for cmd in selectedgitcommands:
+        for cmd in selectedGitCommands:
             print("$>", cmd)
             cp = sub.run(cmd, shell=True)
             if cp.returncode:
@@ -115,22 +125,22 @@ def syncall(repodirs):
             if cp.returncode == 1 and cmd.find(" commit ") >= 0:
                 pass
             elif cp.returncode != 0:
-                tmperr = 1
+                tmpErr = 1
                 break # don't run any further commands
 
-        if tmperr == 0:
+        if tmpErr == 0:
             print("SUCCESS")
         else:
-            errdirs.append(dirpath)
+            errDirs.append(dirpath)
             print("ERROR!!", file=sys.stderr)
 
-    return errdirs
+    return errDirs
 
 
-def scangroups(argv):
+def scanGroups(argv):
     groups = []
     if len(argv) == 1:
-        groups = ["all"] # sync all dirs in repodirs
+        groups = ["all"] # sync all dirs in repoDirs
     else:
         groups = [g.strip().lower() for g in sys.argv[1:]]
 
@@ -139,21 +149,21 @@ def scangroups(argv):
 
 if __name__ == "__main__":
 
-    reposinfo = filterdeadrepos(getreposinfo())
+    repos = filterDeadRepos(getReposInfo())
 
-    groups = scangroups(sys.argv)
+    groups = scanGroups(sys.argv)
 
-    reposinfo = filterbygroup(reposinfo, groups)
+    repos = filterByGroup(repos, groups)
 
-    if not reposinfo:
+    if not repos:
         print("NO REPOS MATCH SELECTION. EXITING")
         exit(1)
 
-    repodirs = getrepodirs(reposinfo)
-    errdirs = syncall(repodirs)
-    if errdirs:
-        print("Error Dirs:", os.linesep, errdirs, file=sys.stderr)
-        print(os.linesep, "{} ERRORS".format(len(errdirs)), os.linesep, sep="", file=sys.stderr)
+    repoDirs = getRepoDirs(repos)
+    errDirs = syncAll(repoDirs)
+    if errDirs:
+        print("Error Dirs:", os.linesep, errDirs, file=sys.stderr)
+        print(os.linesep, "{} ERRORS".format(len(errDirs)), os.linesep, sep="", file=sys.stderr)
     else:
         print(os.linesep, "SUCCESS. :)", os.linesep, sep="")
 

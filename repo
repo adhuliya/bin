@@ -10,6 +10,7 @@ import re
 import subprocess as sub
 from io import StringIO
 from textwrap import dedent
+import copy
 
 
 mydata = os.environ.get("MYDATA", "/home/codeman/mydata")
@@ -42,7 +43,17 @@ cmd = {
     "set global-user.email": "git config --global user.email \"{}\"",
     "set local-user.email": "git config --local user.email \"{}\"",
     "git-init":"git init",
-}
+    }
+
+defaultRepo = { 
+        "groups": ["all"],
+        "dir": "",
+        "origin-url": "",
+        "user.name": "",
+        "user.email": "",
+        "live": True,
+        "read-only": False,
+        }
 
 def findgitrepos(rootdir=reporootdir):
     gitrepos = []
@@ -110,15 +121,7 @@ def addnewreposinfo(oldreposinfo, currrepodirs):
             newrepodirs.append(repodir)
 
     for repodir in newrepodirs:
-        d = {
-                "groups": ["all"],
-                "dir": repodir,
-                "origin-url": "",
-                "user.name": "",
-                "user.email": "",
-                "live": True,
-                "readonly": False,
-                }
+        d = copy.deepcopy(defaultRepo)
         updatedreposinfo.append(d)
 
     return updatedreposinfo
@@ -189,9 +192,9 @@ def updateinfo():
             newrepo = True
 
         if repoinfo["dir"].endswith("-git"):
-            repoinfo["readonly"] = False
+            repoinfo["read-only"] = False
         else:
-            repoinfo["readonly"] = True
+            repoinfo["read-only"] = True
 
         if repoinfo["origin-url"]:
             if newrepo:
