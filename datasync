@@ -32,25 +32,25 @@ def filterByGroup(repos, groups=["all"]):
     """
     Filters out all repoInfos from repos, not belonging to the given groups.
     """
-    filteredReposInfo = []
+    filtered = []
     for repo in repos:
         for repoGroup in repo["groups"]:
             if repoGroup in groups:
-                filteredReposInfo.append(repo)
+                filtered.append(repo)
 
-    return filteredReposInfo
+    return filtered
 
 
 def filterDeadRepos(repos):
     """
     Filters out all the 'dead' repoInfos from repos.
     """
-    liveReposInfo = []
+    filtered = []
     for repo in repos:
         if repo["live"]:
-            liveReposInfo.append(repo)
+            filtered.append(repo)
 
-    return liveReposInfo
+    return filtered
 
 
 def filterByPath(repos, pathSubString=None):
@@ -62,15 +62,15 @@ def filterByPath(repos, pathSubString=None):
     if pathSubString is None:
         return repos
 
-    filteredReposInfo = []
+    filtered = []
     for repo in repos:
         if pathSubString in repo["dir"]:
-            filteredReposInfo.append(repo)
+            filtered.append(repo)
 
-    return filteredReposInfo
+    return filtered
 
 
-def readReposInfoFile(filename=repoListFile):
+def readRepoConfigFile(filename=repoListFile):
     """ read the repoInfos from the given file """
     repos = []
     with open(filename) as f:
@@ -84,7 +84,7 @@ def readReposInfoFile(filename=repoListFile):
 def getRepoDirs(repos=None):
     repoDirs = []
     if not repos:
-        repos = readReposInfoFile()
+        repos = readRepoConfigFile()
         repos = filterDeadRepos(repos)
 
     for repo in repos:
