@@ -149,7 +149,7 @@ def scanGroups(argv):
 
 if __name__ == "__main__":
 
-    repos = filterDeadRepos(getReposInfo())
+    repos = filterDeadRepos(readRepoConfigFile())
 
     groups = scanGroups(sys.argv)
 
