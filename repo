@@ -122,6 +122,7 @@ def addnewreposinfo(oldreposinfo, currrepodirs):
 
     for repodir in newrepodirs:
         d = copy.deepcopy(defaultRepo)
+        d["dir"] = repodir
         updatedreposinfo.append(d)
 
     return updatedreposinfo
@@ -162,7 +163,7 @@ def updateinfo():
     errdirs = []
 
     oldreposinfo = getoldreposinfo(repolistfile)
-    currrepodirs = findallgitrepos()
+    currrepodirs = findgitrepos()
 
     updatedreposinfo = addnewreposinfo(oldreposinfo, currrepodirs)
 
@@ -305,7 +306,7 @@ if __name__ == "__main__":
             print(os.linesep.join(gitrepos))
             print(os.linesep, len(gitrepos), sep="")
         elif subcmd == "listall":
-            gitrepos = findallgitrepos()
+            gitrepos = findgitrepos()
             print(os.linesep.join(gitrepos))
             print(os.linesep, len(gitrepos), sep="")
         elif subcmd == "tosetup":
