@@ -138,6 +138,64 @@ def dictRepr(d):
         dict_repr = sio.getvalue()
     return dict_repr
 
+def generateStats(reposinfo):
+    totalRepos = len(reposinfo)
+    live = 0
+    readOnly = 0
+    users = set() # their emails
+    groups = set()
+
+    githubRepos = 0
+    bitbucketRepos = 0
+    gitCseIitbRepos = 0
+    otherRepos = 0
+
+    for repoinfo in reposinfo:
+        if repoinfo["live"]:
+            live += 1
+        if repoinfo["read-only"]:
+            readOnly += 1
+
+        if repoinfo["origin-url"].find("github.com") >= 0:
+            githubRepos += 1
+        elif repoinfo["origin-url"].find("bitbucket.org") >= 0:
+            bitbucketRepos += 1
+        elif repoinfo["origin-url"].find("git.cse.iitb") >= 0:
+            gitCseIitbRepos += 1
+        else:
+            otherRepos += 1
+           
+
+        users.add(repoinfo["user.email"])
+        for grp in repoinfo["groups"]:
+            groups.add(grp)
+
+    # Fromat the stats into a nice Python comment for output
+    stats = dedent(
+    """\
+    # STATS
+    # Total Repos : {totalRepos}
+    # Live        : {live}
+    # Read-Only   : {readOnly}
+    # Origins at:
+    #   GitHub      : {githubRepos}
+    #   Bitbucket   : {bitbucketRepos}
+    #   GitCseIitb  : {gitCseIitbRepos}
+    #   Others      : {otherRepos}
+    # Groups      : {groups}
+    # Users       : {users}
+    """).format(totalRepos=totalRepos,
+                live=live,
+                readOnly=readOnly,
+                githubRepos=githubRepos,
+                bitbucketRepos=bitbucketRepos,
+                gitCseIitbRepos=gitCseIitbRepos,
+                otherRepos=otherRepos,
+                groups=sorted(groups),
+                users=sorted(users))
+
+    return stats
+
 
 def writereposinfo(reposinfo, filename=repolistfile):
     reposinfo.sort(key=lambda x: x["dir"])
@@ -145,10 +203,13 @@ def writereposinfo(reposinfo, filename=repolistfile):
     with open(filename, "w") as f:
         f.write(dedent(
         """\
-        # format: List of Python 3 Dicts.
+        # Format: List of Python 3 Dicts.
         # Use only string keys, as keys are sorted for printing
         # Note: The file contents are read using builtins.eval()
-        """) + (os.linesep*2))
+        """) + (os.linesep))
+
+        f.write(generateStats(reposinfo) + os.linesep*2)
+
         f.write("["+(os.linesep*2))
         for repoinfo in reposinfo:
             f.write("{},{}".format(dictRepr(repoinfo),(os.linesep*2)))
