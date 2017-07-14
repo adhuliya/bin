@@ -9,6 +9,7 @@ if [[ ! -z $2 ]]; then
     git fetch --all
     git fetch --tags
     git reset --hard origin/master
+    exit
 fi
 
 OUTPUT=$(git status --short)
