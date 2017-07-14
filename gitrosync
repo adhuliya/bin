@@ -1,8 +1,6 @@
 #!/bin/bash
 
-# echo -e "\n$>>> $(pwd)"
-echo -e "\n$>>> gitrosync program"
-echo -e "\nAD: Read Only Repository : Discarding local changes."
+echo -e "AD: Read Only Repository : Discarding local changes."
 git fetch --all
 git fetch --tags
 git reset --hard origin/master

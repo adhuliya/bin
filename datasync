@@ -10,34 +10,6 @@ myData = os.environ["MYDATA"] or "/home/codeman/mydata"
 repoRootDir = myData + "/git"
 repoListFile = repoRootDir + "/configs-git/mydata-data/repositories.pylist"
 
-gitCommands = [
-"""git add --all""",
-"""git commit -m 'automated-update'""",
-"""git fetch --all""",
-"""git fetch --tags""",
-"""git merge -m "automated-merge" origin/master""",
-"""git push origin master""",
-]
-
-# git status --short        : if no change, blank output
-
-# if changes then,
-#   git add --all
-#   git commit -m 'automated-update'
-
-# git fetch --all
-# git fetch --tags
-
-#  git 
-
-
-
-readOnlyGitCommands = [
-"""git fetch --all""",
-"""git fetch --tags""",
-# """git reset --hard origin/master""",
-]
-
 usageMsg = """Usage: datasync [<groupName> [, <groupName> [...]]
 
 groupName: only sync repos in 'group_name', default is 'all' live repos.
@@ -137,7 +109,7 @@ def syncAll(repoDirs):
             print("SUCCESS")
         else:
             errDirs.append(dirpath)
-            print("ERROR!!", file=sys.stderr)
+            print("ERROR!!", cp.returncode, file=sys.stderr)
 
     return errDirs
 

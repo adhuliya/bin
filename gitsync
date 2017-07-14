@@ -1,12 +1,9 @@
 #!/bin/bash
 
-#echo -e "\n$>>> $(pwd)"
-echo -e "\n$>>> gitsync program"
-
 OUTPUT=$(git status --short)
 
 if [[ ! -z $OUTPUT ]]; then
-  echo -e "\nAD: GIT STATUS: Uncommitted changes!!!!"
+  echo -e "AD: GIT STATUS: Uncommitted changes!!!!"
   git add --all
   if [[ $? -ne 0 ]]; then exit 1; fi
 
@@ -18,7 +15,7 @@ if [[ ! -z $OUTPUT ]]; then
     if [[ $? -ne 0 ]]; then exit 3; fi
   fi
 else
-  echo -e "\nAD: GIT STATUS: OK"
+  echo -e "AD: GIT STATUS: OK"
 fi
 
 
