@@ -1,9 +1,9 @@
 #!/bin/bash
 
-echo -e "\n$>>> $(pwd)\n"
+#echo -e "\n$>>> $(pwd)"
+echo -e "\n$>>> gitsync program"
 
 OUTPUT=$(git status --short)
-ERRCODE=0
 
 if [[ ! -z $OUTPUT ]]; then
   echo -e "\nAD: GIT STATUS: Uncommitted changes!!!!"

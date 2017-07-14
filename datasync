@@ -115,6 +115,7 @@ def syncAll(repoDirs):
 
     for dirpath in repoDirs:
         tmpErr = 0
+        cp = None
         print(os.linesep, "$>>> ", dirpath, os.linesep, sep="")
 
         try:
@@ -126,25 +127,13 @@ def syncAll(repoDirs):
             errDirs.append(dirpath)
             continue
 
-        selectedGitCommands = None
         if dirpath.endswith("-git"):
-            selectedGitCommands = gitCommands
+            cp = sub.run("gitsync", shell=True)
         else:
-            selectedGitCommands = readOnlyGitCommands
+            # read only repo : discard local changes
+            cp = sub.run("gitrosync", shell=True)
 
-
-        for cmd in selectedGitCommands:
-            print("$>", cmd)
-            cp = sub.run(cmd, shell=True)
-            if cp.returncode:
-                print("$> ReturnCode :", cp.returncode)
-            if cp.returncode == 1 and cmd.find(" commit ") >= 0:
-                pass
-            elif cp.returncode != 0:
-                tmpErr = 1
-                break # don't run any further commands
-
-        if tmpErr == 0:
+        if cp.returncode == 0:
             print("SUCCESS")
         else:
             errDirs.append(dirpath)
