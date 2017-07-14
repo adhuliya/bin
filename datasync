@@ -13,15 +13,29 @@ repoListFile = repoRootDir + "/configs-git/mydata-data/repositories.pylist"
 gitCommands = [
 """git add --all""",
 """git commit -m 'automated-update'""",
-"""git fetch origin master""",
+"""git fetch --all""",
+"""git fetch --tags""",
 """git merge -m "automated-merge" origin/master""",
 """git push origin master""",
 ]
 
+# git status --short        : if no change, blank output
+
+# if changes then,
+#   git add --all
+#   git commit -m 'automated-update'
+
+# git fetch --all
+# git fetch --tags
+
+#  git 
+
+
+
 readOnlyGitCommands = [
 """git fetch --all""",
 """git fetch --tags""",
-"""git reset --hard origin/master""",
+# """git reset --hard origin/master""",
 ]
 
 usageMsg = """Usage: datasync [<groupName> [, <groupName> [...]]

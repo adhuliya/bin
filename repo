@@ -42,7 +42,8 @@ cmd = {
     "get local-user.email": "git config --local --get user.email",
     "set global-user.email": "git config --global user.email \"{}\"",
     "set local-user.email": "git config --local user.email \"{}\"",
-    "git-init":"git init",
+    "git-init": "git init",
+    "upstream": "git branch -u origin/master master",
     }
 
 defaultRepo = { 
