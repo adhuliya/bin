@@ -3,8 +3,23 @@
 DIR=.
 cd $DIR
 echo -e "\n$>>> $DIR\n"
+
+OUTPUT=$(git status --short)
+
+if [[ ! -z $OUTPUT ]]; then
+  echo "\nAD: Uncommitted changes!!!!"
+  git add --all
+
+  if [ "$1" == "" ]; then
+    git commit -m 'semiautomated-update'
+  else
+    git commit -m "$1"
+  fi
+fi
+
 git fetch origin master
-OUTPUT=$(git diff origin/master)
+
+OUTPUT=$(git diff master origin/master)
 
 if [[ -z $OUTPUT ]]; then
     echo "Local state matches origin/master"
@@ -12,14 +27,6 @@ if [[ -z $OUTPUT ]]; then
 fi
 
 # reaches here only when any new content is present
-
-git add --all
-
-if [ "$1" == "" ]; then
-    git commit -m 'semiautomated-update'
-else
-    git commit -m "$1"
-fi
 
 git merge -m "semiautomated-merge" origin/master
 git push origin master
