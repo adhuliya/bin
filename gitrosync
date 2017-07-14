@@ -1,0 +1,9 @@
+#!/bin/bash
+
+echo -e "\n$>>> $(pwd)\n"
+echo -e "\nAD: Read Only Repository"
+git fetch --all
+git fetch --tags
+git reset --hard origin/master
+
+

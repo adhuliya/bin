@@ -1,16 +1,6 @@
 #!/bin/bash
 
-DIR=.
-cd $DIR
-echo -e "\n$>>> $DIR\n"
-
-if [[ ! -z $2 ]]; then
-    echo -e "\nAD: Read Only Repository"
-    git fetch --all
-    git fetch --tags
-    git reset --hard origin/master
-    exit
-fi
+echo -e "\n$>>> $(pwd)\n"
 
 OUTPUT=$(git status --short)
 
