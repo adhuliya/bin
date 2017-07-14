@@ -7,7 +7,7 @@ echo -e "\n$>>> $DIR\n"
 OUTPUT=$(git status --short)
 
 if [[ ! -z $OUTPUT ]]; then
-  echo "\nAD: Uncommitted changes!!!!"
+  echo -e "\nAD: GIT STATUS: Uncommitted changes!!!!"
   git add --all
 
   if [ "$1" == "" ]; then
@@ -15,8 +15,12 @@ if [[ ! -z $OUTPUT ]]; then
   else
     git commit -m "$1"
   fi
+else
+  echo -e "\nAD: GIT STATUS: OK"
 fi
 
+
+echo -e "\nAD: Fetching origin/master."
 git fetch origin master
 
 OUTPUT=$(git diff master origin/master)
@@ -25,6 +29,8 @@ if [[ -z $OUTPUT ]]; then
     echo "Local state matches origin/master"
     exit
 fi
+
+echo -e "\nAD: Local and Remote differ. Merging and Pushing."
 
 # reaches here only when any new content is present
 
