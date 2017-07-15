@@ -13,7 +13,7 @@ done
 
 for x in *.mp4; do
     echo -e "Compressing $x"
-    ffmpeg -i $x -c:v libx264 -crf 23 $compressed/$x &>> $compressed/output.log
+    ffmpeg -strict -2 -i $x -c:v libx264 -crf 23 $compressed/$x &>> $compressed/output.log
     if [[ $? -ne 0 ]]; then
         echo "$x" >> $compressed/error.log
         ((error++))
