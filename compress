@@ -1,6 +1,0 @@
-#!/bin/bash
-
-
-mkdir compressed1234
-jpegoptim -m50 -d compressed1234 *.jpg
-echo "Compressed" `echo *.jpg | wc -w` "files"

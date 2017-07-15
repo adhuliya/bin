@@ -1,0 +1,33 @@
+#!/bin/bash
+
+
+compressed=mp4compressed
+mkdir $compressed
+
+count=0
+total=0
+error=0
+for x in *.mp4; do
+    ((total++))
+done
+
+for x in *.mp4; do
+    echo -e "Compressing $x"
+    ffmpeg -i $x -c:v libx264 -crf 23 $compressed/$x &>> $compressed/output.log
+    if [[ $? -ne 0 ]]; then
+        echo "$x" >> $compressed/error.log
+        ((error++))
+    fi
+    echo "$x" >> $compressed/success.log
+    ((count++))
+    echo -e "Compressed  $x"
+    echo -e "Done  $count / $total"
+done
+
+if [[ $error -eq 0 ]]; then
+    echo "SUCCESS"
+else
+    echo "Error $error"
+fi
+
+

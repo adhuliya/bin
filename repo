@@ -165,7 +165,7 @@ def generateStats(reposinfo):
             gitCseIitbRepos += 1
         else:
             otherRepos += 1
-           
+
 
         users.add(repoinfo["user.email"])
         for grp in repoinfo["groups"]:
@@ -285,6 +285,12 @@ def updateinfo():
             print("$> {}".format(command))
             originurl = sub.getoutput(command).strip()
             repoinfo["origin-url"] = originurl
+
+        # print("$> {}".format(cmd["upstream"]))
+        # cp = sub.run(cmd["upstream"], shell=True)
+        # if cp.returncode:
+        #     errdirs.append(repoabsdir)
+        #     print("$> Return Code : {}".format(cp.returncode))
 
         if repoinfo["user.name"]:
             print("$> Set user.name")
