@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# for ffmpeg command see http://slhck.info/video/2017/02/24/crf-guide.html
 
 compressed=mp4compressed
 mkdir $compressed
