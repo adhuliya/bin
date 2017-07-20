@@ -1,6 +1,15 @@
 #!/bin/bash
 
+# check if the current folder has jpg files if not, exit
 
+ls *.jpg *.JPG *.jpeg &> /dev/null
+
+if [[ $? == 2 ]]; then
+    echo "AD: compress-img: No image files in current folder."
+    exit
+fi
+
+# process jpg files
 compressed=compressed1234
 mkdir $compressed
 
