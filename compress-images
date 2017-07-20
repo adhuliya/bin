@@ -16,7 +16,7 @@ imageTypeExt = {
         }
 
 """
-Image extension set generated from imageFiles dictionary.
+Image extension set generated from imageTypeExt dictionary.
 """
 imageExtSet = set([v for val in imageTypeExt.values() for v in val])
 

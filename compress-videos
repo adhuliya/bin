@@ -1,0 +1,97 @@
+#/usr/bin/env python3
+
+# for ffmpeg command see http://slhck.info/video/2017/02/24/crf-guide.html
+# ffmpeg -i $x -c:v libx264 -crf 23 -strict -2 $compressed/$x &>> $compressed/output.log
+
+import os
+import os.path as osp
+import subprocess as sub
+
+compressedFolderName = "compressed-videos"
+
+"""
+Video type and its all possible file extensions:
+    "videoTypeName" : [ lowercase-video-file-extensions ]
+Only add videos that can be compressed.
+"""
+videoTypeExt = {
+        "mp4" : [".mp4"],
+        }
+
+"""
+Video extension set generated from videoTypeExt dictionary.
+"""
+videoExtSet = set([v for val in videoTypeExt.values() for v in val])
+
+def isVideoFile(filename):
+    ext = osp.splitext(filename)[1]
+    if ext.lower() in videoExtSet:
+        return True
+    else:
+        return False
+
+"""
+Tells if the filename corresponds to the given video type e.g. "mp4"
+"""
+def isVideoFileTypeX(filename, videoTypeName):
+    ext = osp.splitext(filename)[1]
+    if videoTypeName not in videoTypeExt:
+        raise TypeError("VideoTypeName not present.")
+
+    if ext.lower() in videoTypeExt[videoTypeName]:
+        return True
+    else:
+        return False
+
+
+def videoInFolder():
+    videoPresent = False
+
+    files = os.listdir()
+    for filename in files:
+        if isVideoFile(filename):
+            videoPresent = True
+
+    return videoPresent
+
+def compressMp4(filename):
+    cmd = "ffmpeg -i {filename} -c:v libx264 -crf 23 -strict -2 {folder}/{filename}".format(folder=compressedFolderName, filename=filename)
+
+    cp = sub.run(cmd, shell=True)
+    if cp.returncode != 0:
+        print("AD: Error while processing file: {filename}".format(filename=filename))
+
+def compressFolderVideos():
+    files = os.listdir()
+
+    videoFiles = []
+    for filename in files:
+        if isVideoFile(filename):
+            videoFiles.append(filename)
+
+    count = 0
+    for filename in videoFiles:
+        vfile = False
+        if isVideoFileTypeX(filename, "jpeg"):
+            compressJpeg(filename)
+            vFile = True
+
+        if vFile:
+            count += 1
+            print("AD: Done : [{:>2}/{:>2}]".format(count, len(videoFiles)))
+
+
+def createCompressedFolderIfNotExists():
+    if not osp.exists(compressedFolderName):
+        os.mkdir(compressedFolderName)
+
+if __name__ == "__main__":
+    if not videoInFolder():
+        print("AD: compress-img: No compressable videos in folder.")
+        exit(1)
+
+    createCompressedFolderIfNotExists()
+
+    compressFolderVideos()
+
+
