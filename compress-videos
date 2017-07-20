@@ -1,4 +1,4 @@
-#/usr/bin/env python3
+#!/usr/bin/env python3
 
 # for ffmpeg command see http://slhck.info/video/2017/02/24/crf-guide.html
 # ffmpeg -i $x -c:v libx264 -crf 23 -strict -2 $compressed/$x &>> $compressed/output.log
@@ -88,9 +88,10 @@ def createCompressedFolderIfNotExists():
 
 if __name__ == "__main__":
     if not videoInFolder():
-        print("AD: compress-img: No compressable videos in folder.")
+        print("AD: compress-videos: No compressable videos in folder.")
         exit(1)
 
+    print('here1')
     createCompressedFolderIfNotExists()
 
     compressFolderVideos()

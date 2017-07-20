@@ -71,7 +71,7 @@ def createCompressedFolderIfNotExists():
 
 if __name__ == "__main__":
     if not imageInFolder():
-        print("AD: compress-img: No compressable images in folder.")
+        print("AD: compress-images: No compressable images in folder.")
         exit(1)
 
     createCompressedFolderIfNotExists()
