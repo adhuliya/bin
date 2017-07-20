@@ -1,6 +1,6 @@
 #!/bin/bash
 
-mkdir thumbnail1234
+mkdir thumbnails
 
 for img in *.jpg; do
     w=`identify -format '%w' $img`

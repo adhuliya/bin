@@ -1,46 +1,81 @@
-#!/bin/bash
+#!/usr/bin/env python3
 
-# check if the current folder has jpg files if not, exit
+import os
+import os.path as osp
+import subprocess as sub
 
-jpg1=*.jpg
-jpg2=*.JPG
-jpg3=*.jpeg
-jpg4=*.JPEG
+compressedFolderName = "compressed-images"
 
-if [[ $jpg1 == "*.jpg" && $jpg2 == "*.JPG" && $jpg3 == "*.jpeg" && $jpg4 == "*.JPEG" ]]; then
-    echo "AD: compress-img: No image files in current folder."
-    exit 1
-fi
+"""
+Image type and its all possible file extensions:
+    "imageTypeName" : [ lowercase-image-file-extensions ]
+Only images that can be compressed.
+"""
+imageTypeExt = {
+        "jpeg" : [".jpg", ".jpeg"],
+        }
 
-# process jpg files
-compressed=compressed1234
-mkdir $compressed
+"""
+Image extension set generated from imageFiles dictionary.
+"""
+imageExtSet = set([v for val in imageTypeExt.values() for v in val])
 
-count=0
-total=0
-error=0
-for x in *.jpg *.JPG; do
-    ((total++))
-done
+def isImageFile(filename):
+    ext = osp.splitext(filename)[1]
+    if ext.lower() in imageExtSet:
+        return True
+    else:
+        return False
 
-for x in *.jpg *.JPG; do
-    echo -e "Compressing $x"
-    jpegoptim -m50 -d $compressed $x
-    if [[ $? -ne 0 ]]; then
-        echo "$x" >> $compressed/error.log
-        ((error++))
-    fi
-    echo "$x" >> $compressed/success.log
-    ((count++))
-    echo -e "Compressed  $x"
-    echo -e "Done  $count / $total"
-done
+"""
+Tells if the filename corresponds to the given image type e.g. "jpeg"
+"""
+def isImageFileTypeX(filename, imageTypeName):
+    ext = osp.splitext(filename)[1]
+    if imageTypeName not in imageTypeExt:
+        raise TypeError("ImageTypeName not present.")
 
-if [[ $error -eq 0 ]]; then
-    echo "SUCCESS"
-else
-    echo "Error $error"
-fi
+    if ext.lower() in imageTypeExt[imageTypeName]:
+        return True
+    else:
+        return False
 
+
+def imageInFolder():
+    imagePresent = False
+
+    files = os.listdir()
+    for filename in files:
+        if isImageFile(filename):
+            imagePresent = True
+
+    return imagePresent
+
+def compressJpeg(filename):
+    cmd = "jpegoptim -m50 -d {folder} {filename}".format(folder=compressedFolderName, filename=filename)
+
+    cp = sub.run(cmd, shell=True)
+    if cp.returncode != 0:
+        print("AD: Error while processing file: {filename}".format(filename=filename))
+
+def compressFolderImages():
+    files = os.listdir()
+
+    for filename in files:
+        if isImageFileTypeX(filename, "jpeg"):
+            compressJpeg(filename)
+
+def createCompressedFolderIfNotExists():
+    if not osp.exists(compressedFolderName):
+        os.mkdir(compressedFolderName)
+
+if __name__ == "__main__":
+    if not imageInFolder():
+        print("AD: compress-img: No compressable images in folder.")
+        exit(1)
+
+    createCompressedFolderIfNotExists()
+
+    compressFolderImages()
 
 
