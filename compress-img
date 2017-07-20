@@ -2,11 +2,14 @@
 
 # check if the current folder has jpg files if not, exit
 
-ls *.jpg *.JPG *.jpeg &> /dev/null
+jpg1=*.jpg
+jpg2=*.JPG
+jpg3=*.jpeg
+jpg4=*.JPEG
 
-if [[ $? == 2 ]]; then
+if [[ $jpg1 == "*.jpg" && $jpg2 == "*.JPG" && $jpg3 == "*.jpeg" && $jpg4 == "*.JPEG" ]]; then
     echo "AD: compress-img: No image files in current folder."
-    exit
+    exit 1
 fi
 
 # process jpg files
