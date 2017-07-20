@@ -55,6 +55,7 @@ def videoInFolder():
     return videoPresent
 
 def compressMp4(filename):
+    print("AD: Compressing mp4 file {}".format(filename))
     cmd = "ffmpeg -i {filename} -c:v libx264 -crf 23 -strict -2 {folder}/{filename}".format(folder=compressedFolderName, filename=filename)
 
     cp = sub.run(cmd, shell=True)
@@ -72,8 +73,8 @@ def compressFolderVideos():
     count = 0
     for filename in videoFiles:
         vfile = False
-        if isVideoFileTypeX(filename, "jpeg"):
-            compressJpeg(filename)
+        if isVideoFileTypeX(filename, "mp4"):
+            compressMp4(filename)
             vFile = True
 
         if vFile:
