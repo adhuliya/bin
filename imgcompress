@@ -7,11 +7,11 @@ mkdir $compressed
 count=0
 total=0
 error=0
-for x in *.jpg; do
+for x in *.jpg *.JPG; do
     ((total++))
 done
 
-for x in *.jpg; do
+for x in *.jpg *.JPG; do
     echo -e "Compressing $x"
     jpegoptim -m50 -d $compressed $x
     if [[ $? -ne 0 ]]; then

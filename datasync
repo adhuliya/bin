@@ -1,7 +1,7 @@
 #!/bin/bash
 
-echo -e "AD: Executing: datasync core"
+echo -e "AD: Executing: datasync.py core"
 datasync.py core
 
-echo -e "\nAD: Executing: datasync"
+echo -e "\nAD: Executing: datasync.py"
 datasync.py all
