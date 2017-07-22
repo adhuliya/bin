@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# run with sudo privileges
+
+if [[ -z "$1" ]]; then 
+  echo -e "AD: Enter Size in KB"
+  exit 1
+fi
+
+mkfs -t ext2 -q /dev/ram1 $1
+mkdir -p /media/ram1
+mount /dev/ram1 /media/ram1
+df -H | grep ram1
