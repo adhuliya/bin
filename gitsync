@@ -23,11 +23,16 @@ echo -e "\nAD: Fetching origin/master."
 git fetch origin master
 if [[ $? -ne 0 ]]; then exit 4; fi
 
-OUTPUT=$(git diff master origin/master)
-
-if [[ -z $OUTPUT ]]; then
-    echo "Local state matches origin/master"
-    exit
+# A fresh repo has no branch `master`.
+# Check if `master` exists and only then run `git diff`.
+OUTPUT=$(git branch --list)
+if [[ -n "$OUTPUT" ]]; then
+  echo -e "\nAD: git diff master origin/master."
+  OUTPUT=$(git diff master origin/master)
+  if [[ -z $OUTPUT ]]; then
+     echo "Local state matches origin/master"
+     exit
+  fi
 fi
 
 echo -e "\nAD: Local and Remote differ. Merging and Pushing."
