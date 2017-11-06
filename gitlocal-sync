@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# Commit and Sync the changes of local git repo locally only.
+
+OUTPUT=$(git status --short)
+
+if [[ ! -z $OUTPUT ]]; then
+  echo -e "AD: GIT STATUS: Uncommitted changes!!!!"
+  git add --all
+  if [[ $? -ne 0 ]]; then exit 1; fi
+
+  if [ "$1" == "" ]; then
+    git commit -m 'semiautomated-update'
+    if [[ $? -ne 0 ]]; then exit 2; fi
+  else
+    git commit -m "$1"
+    if [[ $? -ne 0 ]]; then exit 3; fi
+  fi
+else
+  echo -e "AD: GIT STATUS: OK"
+fi
+
+

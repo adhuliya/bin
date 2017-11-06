@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Commit and Sync the changes of local git repo with the remote.
+
 OUTPUT=$(git status --short)
 
 if [[ ! -z $OUTPUT ]]; then
