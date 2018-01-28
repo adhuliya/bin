@@ -10,12 +10,15 @@ cd $MYDATA/git/research/writeups/research-notes-git/tiddlywiki
 # starts server on the current device only.
 # tiddlywiki mynewwiki --server 5050 >> $MYDATA/local/logs/tiddlywiki/tiddlywiki.log 2>&1 &
 
+echo `date` >> $MYDATA/local/logs/tiddlywiki/tiddlywiki.log
 # starts server on all availabe ips making it accessible from other computers on the network.
 # it also sets the username and the password.
 tiddlywiki mynewwiki --server 5050 $:/core/save/all text/plain text/html mywiki01 record482 0.0.0.0 >> $MYDATA/local/logs/tiddlywiki/tiddlywiki.log 2>&1 &
+echo "Started tiddlywiki" >> $MYDATA/local/logs/tiddlywiki/tiddlywiki.log
 
 cd others
 
 python3 -m http.server 5051 >> $MYDATA/local/logs/tiddlywiki/tiddlywiki-others.log 2>&1 &
+echo "Started python3 server" >> $MYDATA/local/logs/tiddlywiki/tiddlywiki.log
 
 
