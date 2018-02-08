@@ -15,7 +15,8 @@ Video type and its all possible file extensions:
 Only add videos that can be compressed.
 """
 videoTypeExt = {
-        "mp4" : [".mp4"],
+        "mp4" : [".mp4", ".MP4"],
+        "mov" : [".mov", ".MOV"],
         }
 
 """
@@ -62,8 +63,18 @@ def compressMp4(filename):
     if cp.returncode != 0:
         print("AD: Error while processing file: {filename}".format(filename=filename))
 
+def compressMov(filename):
+    print("AD: Compressing mp4 file {}".format(filename))
+
+    cmd = "ffmpeg -i {filename} -vcodec h264 -acodec aac -strict -2 {folder}/{filename}".format(folder=compressedFolderName, filename=filename)
+
+    cp = sub.run(cmd, shell=True)
+    if cp.returncode != 0:
+        print("AD: Error while processing file: {filename}".format(filename=filename))
+
 def compressFolderVideos():
     files = os.listdir()
+    vFile = False
 
     videoFiles = []
     for filename in files:
@@ -75,6 +86,9 @@ def compressFolderVideos():
         vfile = False
         if isVideoFileTypeX(filename, "mp4"):
             compressMp4(filename)
+            vFile = True
+        elif isVideoFileTypeX(filename, "mov"):
+            compressMov(filename)
             vFile = True
 
         if vFile:
@@ -91,7 +105,6 @@ if __name__ == "__main__":
         print("AD: compress-videos: No compressable videos in folder.")
         exit(1)
 
-    print('here1')
     createCompressedFolderIfNotExists()
 
     compressFolderVideos()
