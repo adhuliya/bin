@@ -5,6 +5,7 @@ import os.path as osp
 import subprocess as sub
 
 compressedFolderName = "compressed-images"
+errorlog = "error.log"
 
 """
 Image type and its all possible file extensions:
@@ -48,26 +49,52 @@ def imageInFolder():
     for filename in files:
         if isImageFile(filename):
             imagePresent = True
+            break
 
     return imagePresent
 
 def compressJpeg(filename):
-    cmd = "jpegoptim -m50 -d {folder} {filename}".format(folder=compressedFolderName, filename=filename)
+    success = True
+    cmd = 'jpegoptim -m50 -d "{folder}" "{filename}" >> "{folder}/{errorlog}" 2>&1'.format(folder=compressedFolderName, filename=filename, errorlog=errorlog)
 
     cp = sub.run(cmd, shell=True)
     if cp.returncode != 0:
-        print("AD: Error while processing file: {filename}".format(filename=filename))
+        print("AD: Error for file: {filename}".format(filename=filename))
+        success = False
+
+    return success
 
 def compressFolderImages():
     files = os.listdir()
+    errorFiles = []
+    success = False
 
-    for filename in files:
+    imgFiles = [fn for fn in files if isImageFile(fn)]
+    counter = 0
+
+    for filename in imgFiles:
         if isImageFileTypeX(filename, "jpeg"):
-            compressJpeg(filename)
+            success = compressJpeg(filename)
+            if not success:
+                errorFiles.append(filename)
+
+        counter += 1
+        print("{:3}/{:3} done.\r".format(counter, len(imgFiles)), end='')
+
+    print() # change line
+
+    return errorFiles
 
 def createCompressedFolderIfNotExists():
     if not osp.exists(compressedFolderName):
         os.mkdir(compressedFolderName)
+
+def writeErrorLogHeader():
+    cmd = "echo -e \"\nnew log started: `date`\n\n\" >> {folder}/{errorlog}".format(folder=compressedFolderName, errorlog=errorlog)
+
+    cp = sub.run(cmd, shell=True)
+    if cp.returncode != 0:
+        print("AD: Error in writing to {folder}/{errorlog}".format(folder=compressedFolderName, errorlog=errorlog))
 
 if __name__ == "__main__":
     if not imageInFolder():
@@ -75,7 +102,11 @@ if __name__ == "__main__":
         exit(1)
 
     createCompressedFolderIfNotExists()
+    writeErrorLogHeader();
 
-    compressFolderImages()
+    errorFiles = compressFolderImages()
+
+    if errorFiles:
+        print("AD: ERROR in {} Files,\n{}".format(len(errorFiles), errorFiles))
 
 
