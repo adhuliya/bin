@@ -3,9 +3,12 @@
 import os
 import os.path as osp
 import subprocess as sub
+import sys
 
 compressedFolderName = "compressed-images"
-errorlog = "error.log"
+outputLog = "output.log"
+# jpeg quality percentage in range [1, 100]
+jpegQuality = 50 # default
 
 """
 Image type and its all possible file extensions:
@@ -55,7 +58,7 @@ def imageInFolder():
 
 def compressJpeg(filename):
     success = True
-    cmd = 'jpegoptim -m50 -d "{folder}" "{filename}" >> "{folder}/{errorlog}" 2>&1'.format(folder=compressedFolderName, filename=filename, errorlog=errorlog)
+    cmd = 'jpegoptim -m50 -d "{folder}" "{filename}" >> "{folder}/{outputLog}" 2>&1'.format(folder=compressedFolderName, filename=filename, outputLog=outputLog)
 
     cp = sub.run(cmd, shell=True)
     if cp.returncode != 0:
@@ -66,6 +69,7 @@ def compressJpeg(filename):
 
 def compressFolderImages():
     files = os.listdir()
+    files.sort()
     errorFiles = []
     success = False
 
@@ -90,16 +94,43 @@ def createCompressedFolderIfNotExists():
         os.mkdir(compressedFolderName)
 
 def writeErrorLogHeader():
-    cmd = "echo -e \"\nnew log started: `date`\n\n\" >> {folder}/{errorlog}".format(folder=compressedFolderName, errorlog=errorlog)
+    cmd = "echo -e \"\nnew log started: `date`\n\n\" >> {folder}/{outputLog}".format(folder=compressedFolderName, outputLog=outputLog)
 
     cp = sub.run(cmd, shell=True)
     if cp.returncode != 0:
-        print("AD: Error in writing to {folder}/{errorlog}".format(folder=compressedFolderName, errorlog=errorlog))
+        print("AD: ERROR: in writing to {folder}/{outputLog}".format(folder=compressedFolderName, outputLog=outputLog))
+
+def readPercent(percent):
+    try:
+        p = int(percent)
+    except ValueError as ve:
+        return None, ve
+
+    if 1 <= p <= 100:
+        return p, None
+    else:
+        return p, "Range Error not in [1, 100]"
 
 if __name__ == "__main__":
     if not imageInFolder():
-        print("AD: compress-images: No compressable images in folder.")
+        print("AD: ERROR: compress-images: No compressable images in folder.")
         exit(1)
+
+    if len(sys.argv) == 1:
+        compressedFolderName = compressedFolderName + "-" + str(jpegQuality)
+
+    elif len(sys.argv) == 2:
+        qualityPercent, err = readPercent(sys.argv[1])
+        if not err:
+            jpegQuality = qualityPercent
+            compressedFolderName = compressedFolderName + "-" + str(jpegQuality)
+        else:
+            print("AD: ERROR: Wrong second argument.\n", err)
+            exit(2)
+
+    elif len(sys.argv) > 2:
+        print("AD: ERROR: Wrong number of arguments.")
+        exit(3)
 
     createCompressedFolderIfNotExists()
     writeErrorLogHeader();
