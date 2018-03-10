@@ -83,6 +83,7 @@ def combinedSort(rows):
   newRows = []
   for row in tmpRows:
     newRows.append(row[1])
+    #print("{:>4}".format(row[0]), rowStr(row[1]))
 
   return newRows
 
@@ -93,7 +94,7 @@ if __name__ == "__main__":
 
   combined = combinedSort(rows)
 
-  printRows(combined[:30])
+  printRows(combined[:35])
 
 
 
