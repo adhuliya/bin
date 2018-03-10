@@ -3,6 +3,17 @@
 # for ffmpeg command see http://slhck.info/video/2017/02/24/crf-guide.html
 # ffmpeg -i $x -c:v libx264 -crf 23 -strict -2 $compressed/$x &>> $compressed/output.log
 
+# to rotate video
+# `ffmpeg -i in.mov -vf "transpose=1" out.mov`
+# transpose parameter values:
+#   0 = 90CounterClockwise and Vertical Flip (default)
+#   1 = 90Clockwise
+#   2 = 90CounterClockwise
+#   3 = 90Clockwise and Vertical Flip
+# For 180 degree:
+# `-vf "transpose=2,transpose=2"
+
+
 import os
 import os.path as osp
 import subprocess as sub

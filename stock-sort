@@ -1,0 +1,99 @@
+#!/usr/bin/env python3
+
+import csv
+import sys
+
+def readCsv(filename):
+  """
+  read csv file `filename`
+  expects file line as header:
+  Company name,Symbol,Currency,Market cap,P/E ratio,Return on assets (5 yr avg) (%),Return on assets (Recent yr) (%)
+  """
+  rows = []
+  with open(filename, "r") as f:
+    first = True
+    r = csv.reader(f)
+    for line in r:
+      if first:
+        first = False
+        continue
+      line[4] = float(line[4])
+      line[5] = float(line[5])
+      line[6] = float(line[6])
+      rows.append(line)
+      
+  return rows
+
+def rowStr(row):
+  """
+  expects row with following elements:
+  Company name,Symbol,Currency,Market cap,P/E ratio,Return on assets (5 yr avg) (%),Return on assets (Recent yr) (%)
+  Returns a neat formatted string.
+  """
+  return "{name:20}, {symbol:>8}, {currency:>4}, {marketcap:>8}, {peratio:>5.2f}, {roa5:>5.2f}, {roa:>5.2f}".format(
+      name      = row[0][:20],
+      symbol    = row[1],
+      currency  = row[2],
+      marketcap = row[3],
+      peratio   = row[4],
+      roa5      = row[5],
+      roa       = row[6])
+
+def printRows(rows):
+  print("{name:20}, {symbol:8}, {currency:4}, {marketcap:8}, {peratio:5}, {roa5:5}, {roa:5}".format(
+      name      = "Company Name",
+      symbol    = "Symbol",
+      currency  = "Curr",
+      marketcap = "MarkCap",
+      peratio   = "P/E",
+      roa5      = "ROA5",
+      roa       = "ROA"))
+  for row in rows:
+    print(rowStr(row))
+  
+
+def convertListToDict(rows):
+  map = {} # symbol: (index, list)
+
+  for i, row in enumerate(rows):
+    map[row[1]] = (i, row)
+
+  return map
+
+
+def combinedSort(rows):
+  peSort    = rows
+  roaSort   = rows[:]
+
+  peSort.sort(key=lambda x: x[4])   # p/e ratio
+  roaSort.sort(key=lambda x: -x[5]) # roa 5yr avg
+
+  peSortMap     = convertListToDict(peSort)
+  roaSortMap    = convertListToDict(roaSort)
+
+  tmpRows = []
+  for symbol in peSortMap:
+    peVal  = peSortMap[symbol]
+    roaVal = roaSortMap[symbol]
+    # note peVal[1] == roaVal[1] always
+    tmpRows.append((peVal[0]+roaVal[0], peVal[1]))
+
+  tmpRows.sort(key=lambda x: x[0])
+
+  newRows = []
+  for row in tmpRows:
+    newRows.append(row[1])
+
+  return newRows
+
+
+if __name__ == "__main__":
+  filename = sys.argv[1]
+  rows = readCsv(filename)
+
+  combined = combinedSort(rows)
+
+  printRows(combined[:30])
+
+
+
