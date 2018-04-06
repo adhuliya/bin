@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+for f in *.dot; do
+  basename=$(basename "$f")
+  filename=${basename%.*}
+  command="dot -Tps2 $f -o ${filename}.eps";
+  echo $command;
+  $command;
+done
