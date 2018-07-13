@@ -2,6 +2,8 @@
 
 # Commit and Sync the changes of local git repo with the remote.
 
+# STEP 1: Commit locally if needed.
+
 OUTPUT=$(git status --short)
 
 if [[ ! -z $OUTPUT ]]; then
@@ -21,9 +23,13 @@ else
 fi
 
 
+# STEP 2: Fetch remote/origin
+
 echo -e "\nAD: Fetching origin/master."
 git fetch origin master
 if [[ $? -ne 0 ]]; then exit 4; fi
+
+# STEP 3: Merge and push if master and origin/master differ.
 
 # A fresh repo has no branch `master`.
 # Check if `master` exists and only then run `git diff`.
