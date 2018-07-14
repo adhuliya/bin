@@ -1,0 +1,92 @@
+#!/usr/bin/env python3
+"""
+Splits a file into two chunks.
+The first chunk is only few bytes.
+"""
+
+import sys
+import os.path as osp
+
+PREFIX = "hidesplit"
+SIZE_OF_FIRST_CHUNK = 64  # bytes
+BUFF_SIZE = 1 << 24
+
+usageMsg = """
+usage: hidesplit <filename>
+
+note: file should be at least {} bytes.
+
+It splits a file into two chunks.
+The first chunk is only few bytes.
+""".format(SIZE_OF_FIRST_CHUNK)
+
+def genNextStrSeq(currStrSeq):
+    currIntSeq = int(currStrSeq)
+    nextIntSeq = currIntSeq+1
+    nextStrSeq = str(nextIntSeq)
+    if len(nextStrSeq) == 1:
+        nextStrSeq = "00" + nextStrSeq
+    elif len(nextStrSeq) == 2:
+        nextStrSeq = "0" + nextStrSeq
+
+    return nextStrSeq
+
+def getExt(filename):
+    return filename.rsplit(".")[-1]
+
+def main(filename):
+    if not osp.exists(filename):
+        print("hidesplit: error: file {} doesn't exists".format(filename),
+                file=sys.stderr)
+        exit(2)
+
+    currStrSeq = "001"
+
+    try:
+        file1 = open(filename, "rb")
+    except Exception as e:
+        print("hidesplit: error: cannot open file {}".format(filename),
+                file=sys.stderr)
+        exit(3)
+
+    try:
+        file2 = open(PREFIX+currStrSeq+"."+getExt(filename), "wb")
+    except Exception as e:
+        print("hidesplit: error: cannot create file {}".format(filename),
+                file=sys.stderr)
+        exit(4)
+
+    try:
+        bb = file1.read(SIZE_OF_FIRST_CHUNK)
+        # if len(bb) == SIZE_OF_FIRST_CHUNK:
+        file2.write(bb)
+        file2.close()
+    except:
+        print("hidesplit: error: cannot write to first chunk",
+                file=sys.stderr)
+        exit(5)
+
+    try:
+        file3 = open(PREFIX+genNextStrSeq(currStrSeq)+"."+getExt(filename), "wb")
+        while True:
+            bb = file1.read(BUFF_SIZE)
+            file3.write(bb)
+            if len(bb) != BUFF_SIZE:
+                file3.close()
+                file1.close()
+                break
+    except Exception as e:
+        print("hidesplit: error: cannot create/write-to second chunk",
+                file=sys.stderr)
+        if file1 is not None: file1.close()
+        if file3 is not None: file3.close()
+        exit(6)
+
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print(usageMsg)
+        exit(1)
+
+    main(sys.argv[1])
+
