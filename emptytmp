@@ -1,26 +1,34 @@
 #!/usr/bin/env python3
 """
-Monitors various system attributes periodically.
-It records these parameters in a log file.
+Removes files from tmp folders periodically.
 """
 
-import psutil # needs explicit install
+import psutil # needs install
 import time
 import os
 import subprocess as subp
 import logging
 from logging.handlers import RotatingFileHandler
 
-TIME_PERIOD   = 5 # seconds
-MAX_CPU_UTIL  = 70 # percent
-MAX_MEM_UTIL  = 80 # percent
-LOGICAL_CPU   = psutil.cpu_count(logical=True)
-PHYSICAL_CPU  = psutil.cpu_count(logical=False)
+MAX_AGE = 15 * 24 * 60 * 60 # seconds
+#MAX_AGE = 15 # seconds, just for testing
+
+tmpDirs = [
+    # all tmp directories to-be-cleaned
+    "/home/codeman/mydata/local/tmp/test"
+    ]
+
+# to check system load
+TIME_PERIOD   = 30 # seconds
+#TIME_PERIOD   = 5 # seconds, just for testing
+MAX_CPU_UTIL  = 50 # percent
+MAX_MEM_UTIL  = 70 # percent
+MAX_DELETIONS = 1 << 12
 
 # START : log config vars
 # logging dir is inside home directory of user
-logDir         = ".itsdata/local/logs/sysmonitor"
-logFileName    = "sysmonitor.log"
+logDir         = ".itsdata/local/logs/emptytmp"
+logFileName    = "emptytmp.log"
 logLevel       = logging.INFO # bocks out lower levels
 logFormat1     = "%(message)s, %(asctime)s"
 logMaxSize     = 1 << 24 # in bytes 1 << 24 = 16 MB
@@ -33,7 +41,8 @@ def createDirInHome(dirPath):
     home = "/root"
 
   fullDirPath = os.path.join(home, dirPath)
-  os.makedirs(fullDirPath)
+  if not os.path.exists(fullDirPath):
+    os.makedirs(fullDirPath)
 
   return fullDirPath
 
@@ -49,7 +58,7 @@ def initLogger(logFile=logFileName, logLevel=logLevel, logFormat=logFormat1, log
 
   rootLogger.info("Initialized with format : %s", repr(logFormat))
 
-def okToStart():
+def okToContinue():
   """
   If system utilization is acceptabely low,
   then return True, else false.
@@ -66,15 +75,46 @@ def okToStart():
 
 def record(cpuUsage, memUsage):
   infoString = "CPU:{:>5.2f}%, MEM:{:>5.2f}%".format(cpuUsage, memUsage.percent)
-  print(infoString)
+  #print(infoString)
   log.info(infoString)
+
+def emptyTmp():
+  global tmpDirs
+  count = 0
+
+  try:
+    for tmpDir in tmpDirs:
+      for root, dirs, files in os.walk(tmpDir):
+        for f in files:
+          fullPath = os.path.join(root, f)
+          if os.path.getmtime(fullPath) > MAX_AGE:
+            os.remove(fullPath)
+            count += 1
+            log.info("file: %s", fullPath)
+        for d in dirs:
+          if d in [".", ".."]:
+            log.info("parent dir")
+            continue
+          fullPath = os.path.join(root, d)
+          if os.listdir(fullPath):
+            continue
+          if os.path.getmtime(fullPath) > MAX_AGE:
+            os.rmdir(fullPath) # dir should be empty
+            count += 1
+            log.info("dir : %s", fullPath)
+
+        if count >= MAX_DELETIONS:
+          raise Exception("Max deletions reached.")
+  except Exception as e:
+    log.info(e)
 
 def loopForever():
   while(True):
-    ok = okToStart()
+    ok = okToContinue()
 
     if ok[0]:
       record(ok[1], ok[2])
+      emptyTmp()
 
     time.sleep(TIME_PERIOD)
 
