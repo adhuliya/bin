@@ -1,0 +1,52 @@
+#!/usr/bin/env python3
+
+import os
+import os.path as osp
+import subprocess as sub
+import sys
+
+ROOT_DIR  = os.getenv("MYDATA", None)
+HOST_NAME = os.getenv("HOST", None)
+
+if ROOT_DIR is None or HOST_NAME is None:
+  print(ROOT_DIR, HOST_NAME)
+  print("AD: MYDATA or HOST env variable not set.", file=sys.stderr)
+  exit(1)
+
+BASE_DIR = osp.join(ROOT_DIR, "git/configs-git")
+DEST_DIR = osp.join(BASE_DIR, "sys-files", HOST_NAME)
+FILE_LIST_FILE = osp.join(DEST_DIR, "sys-files.list")
+
+def getOutputExit(cmd):
+  output = sub.getstatusoutput(cmd)
+  if output[0] != 0:
+    print("AD: error: executing '{}', status {}".format(cmd, output[0]), file=sys.stderr)
+    exit(1)
+  return output[1]
+
+def readFileList(filename):
+  filelist = []
+  with open(filename) as fn:
+    for line in fn:
+      if line.strip().startswith("/"):
+        filelist.append(line.strip())
+  return filelist
+
+def copy(filelist):
+  for f in filelist:
+    filedir = osp.dirname(f)
+    # absolute dir of file is preserved inside DEST_DIR
+    destDir = osp.join(DEST_DIR, filedir[1:])
+    getOutputExit("mkdir -p {}".format(destDir))
+    getOutputExit("cp {} {}".format(f, destDir))
+
+def main():
+  filelist = readFileList(FILE_LIST_FILE)
+  copy(filelist)
+
+
+if __name__ == "__main__":
+
+  main()
+
+
