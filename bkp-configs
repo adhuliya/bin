@@ -38,7 +38,7 @@ def copy(filelist):
     # absolute dir of file is preserved inside DEST_DIR
     destDir = osp.join(DEST_DIR, filedir[1:])
     getOutputExit("mkdir -p {}".format(destDir))
-    getOutputExit("cp {} {}".format(f, destDir))
+    getOutputExit("cp -R {} {}".format(f, destDir))
 
 def main():
   filelist = readFileList(FILE_LIST_FILE)

@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 # execute `crontab -e` as a non-root user
-# add the line: `@reboot /home/codeman/mydata/git/bin-git/startup/tiddlywiki`
+# add the line: `@reboot /home/codeman/.itsoflife/git/bin-git/startup/tiddlywiki`
 
-MYDATA=/home/codeman/mydata
+MYDATA=/home/codeman/.itsoflife
 
 cd $MYDATA/git/research/writeups/research-notes-git/tiddlywiki
 
