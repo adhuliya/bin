@@ -1,0 +1,69 @@
+#!/usr/bin/env python3
+#############################
+## STUDY TIMER
+#############################
+
+import sys
+import subprocess as subp
+import time
+
+defaultDuration = 600  # seconds
+extraTime = 120  # seconds
+
+usage = """
+Usage:
+
+  study <seconds> [extra-time-in-seconds]
+ 
+This program helps in manging time chunks.
+This script, sends desktop notifications using `notify-send`.
+
+Notification 1: when timer starts
+Notification 2: when half time is up
+Notification 3: when time is up
+Notification 4: when extra (default) {} seconds are up.
+
+""".format(extraTime)
+
+notification = [
+  'notify-send "Timer Started" "{} secs."',
+  'notify-send "Half Time Up" "{} secs left."',
+  'notify-send "Time Up" "Adding Extra {} sec."',
+  'notify-send "Extra Time Up." "Total {} secs"'
+]
+
+def main():
+  global extraTime
+
+  if len(sys.argv) > 3:
+    print(usage)
+    exit(1)
+
+  if len(sys.argv) == 1:
+    inputSeconds = defaultDuration
+  else:
+    inputSeconds = int(sys.argv[1])
+  half = inputSeconds/2
+
+  if len(sys.argv) == 3:
+    extraTime = int(sys.argv[2])
+
+  displayTime = [inputSeconds, half, extraTime, inputSeconds+extraTime]
+  sleepTime = [half, half, extraTime]
+
+  counter = 0;
+  while True:
+    so = subp.getstatusoutput(notification[counter].format(displayTime[counter]))
+    if counter == 3:
+      exit(0)
+    time.sleep(sleepTime[counter])
+    counter += 1  # incremented before sleeping
+
+
+#    notify-send "Timer Started" "$1 seconds" && echo "Timer Started: $1 seconds" && sleep $HALF && notify-send "Half time up" "$HALF seconds left" && echo "$HALF seconds left." && sleep $HALF && notify-send "Time Up !!" "$1 seconds done" && echo "$1 seconds done" && sleep $EXTRA && notify-send "+ $EXTRA seconds up" "$1 + $EXTRA seconds done" && echo "$1 + $EXTRA seconds done";
+
+if __name__ == "__main__":
+  main()
+
+
+

@@ -3,6 +3,14 @@
 # execute `crontab -e` as a non-root user
 # add the line: `@reboot /home/codeman/.itsoflife/git/bin-git/startup/tiddlywiki`
 
+# Pre-requisites/ dependencies:
+# 1. Install `nodejs` and its pacakge manager `npm`.
+#   sudo apt-get install nodejs
+#   sudo apt-get install npm
+# 2. Install tiddlywiki and test if installed
+#   sudo npm install -g tiddlywiki
+#   tiddlywiki --version
+
 MYDATA=/home/codeman/.itsoflife
 
 cd $MYDATA/git/research/writeups/research-notes-git/tiddlywiki
@@ -11,6 +19,7 @@ cd $MYDATA/git/research/writeups/research-notes-git/tiddlywiki
 # tiddlywiki mynewwiki --server 5050 >> $MYDATA/local/logs/tiddlywiki/tiddlywiki.log 2>&1 &
 
 echo `date` >> $MYDATA/local/logs/tiddlywiki/tiddlywiki.log
+
 # starts server on all availabe ips making it accessible from other computers on the network.
 # it also sets the username and the password.
 tiddlywiki mynewwiki --server 5050 $:/core/save/all text/plain text/html mywiki01 record482 0.0.0.0 >> $MYDATA/local/logs/tiddlywiki/tiddlywiki.log 2>&1 &
