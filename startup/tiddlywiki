@@ -22,7 +22,7 @@ echo `date` >> $MYDATA/local/logs/tiddlywiki/tiddlywiki.log
 
 # starts server on all availabe ips making it accessible from other computers on the network.
 # it also sets the username and the password.
-tiddlywiki mynewwiki --server 5050 $:/core/save/all text/plain text/html mywiki01 record482 0.0.0.0 >> $MYDATA/local/logs/tiddlywiki/tiddlywiki.log 2>&1 &
+/usr/local/bin/tiddlywiki mynewwiki --server 5050 $:/core/save/all text/plain text/html mywiki01 record482 0.0.0.0 >> $MYDATA/local/logs/tiddlywiki/tiddlywiki.log 2>&1 &
 echo "Started tiddlywiki" >> $MYDATA/local/logs/tiddlywiki/tiddlywiki.log
 
 cd others
