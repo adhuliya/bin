@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+# Periodically download an internet page
+# to trick iitb servers in not dropping the net connection.
+
+ADDR=google.com
+while true;
+do
+ echo "`date`: wget $ADDR" >> $MYDATA/local/logs/keep-net-alive.log
+ wget --quiet --output-document=/dev/null $ADDR;
+ sleep 300;
+done
