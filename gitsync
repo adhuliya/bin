@@ -12,7 +12,7 @@ if [[ ! -z $OUTPUT ]]; then
   if [[ $? -ne 0 ]]; then exit 1; fi
 
   if [ "$1" == "" ]; then
-    git commit -m 'semiautomated-update'
+    git commit -m 'semi-automated-update'
     if [[ $? -ne 0 ]]; then exit 2; fi
   else
     git commit -m "$1"
@@ -47,7 +47,7 @@ echo -e "\nAD: Local and Remote differ. Merging and Pushing."
 
 # reaches here only when any new content is present
 
-git merge -m "semiautomated-merge" origin/master
+git merge -m "semi-automated-merge" origin/master
 if [[ $? -ne 0 ]]; then exit 5; fi
 git push origin master
 if [[ $? -ne 0 ]]; then exit 6; fi
