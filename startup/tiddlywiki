@@ -30,4 +30,5 @@ cd others
 python3 -m http.server 5051 >> $MYDATA/local/logs/tiddlywiki/tiddlywiki-others.log 2>&1 &
 echo "Started python3 server" >> $MYDATA/local/logs/tiddlywiki/tiddlywiki.log
 
-
+python3 /home/codeman/.itsoflife/git/bin-git/file_upload.py 2>&1 &
+echo "`date`: Started file upload server." >> $MYDATA/local/logs/tiddlywiki/tiddlywiki.log
