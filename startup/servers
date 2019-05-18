@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+
+# execute `crontab -e` as a non-root user
+# add the line: `@reboot /home/codeman/.itsoflife/git/bin-git/startup/servers`
+
+MYDATA=/home/codeman/.itsoflife
+
+# SERVER 1: tiddlywiki
+# Pre-requisites/ dependencies for tiddlywiki server:
+# 1. Install `nodejs` and its pacakge manager `npm`.
+#   sudo apt-get install nodejs
+#   sudo apt-get install npm
+# 2. Install tiddlywiki and test if installed
+#   sudo npm install -g tiddlywiki
+#   tiddlywiki --version
+
+cd $MYDATA/git/research/writeups/research-notes-git/tiddlywiki
+
+# starts server on the current device only.
+# tiddlywiki mynewwiki --server 5050 >> $MYDATA/local/logs/tiddlywiki/tiddlywiki.log 2>&1 &
+
+PORT=5050
+LOG_DIR=$MYDATA/local/logs/tiddlywiki
+mkdir -p $LOG_DIR
+echo "\n`date`: Starting tiddlywiki server at port $PORT."  >> $LOG_DIR/tiddlywiki.log
+
+# starts server on all availabe ips making it accessible from other computers on the network.
+# it also sets the username and the password.
+/usr/local/bin/tiddlywiki mynewwiki --server $PORT $:/core/save/all text/plain text/html mywiki01 record482 0.0.0.0 >> $LOG_DIR/tiddlywiki.log 2>&1 &
+
+# SERVER 2: html_notes
+cd others
+
+PORT=5051
+LOG_DIR=$MYDATA/local/logs/html_notes
+mkdir -p $LOG_DIR
+echo "\n`date`: Starting python3 static content server at port $PORT." >> $LOG_DIR/html_notes.log
+python3 -u -m http.server $PORT >> $LOG_DIR/html_notes.log 2>&1 &
+
+# SERVER 4: static_content (nginx)
+# nginx automatically starts the server using the config: /etc/nginx/conf.d/file_server.conf
+# $ cat /etc/nginx/conf.d/file_server.conf
+# server {
+#   listen *:5052;
+#   root /home/codeman/.itsoflife/local/tmp/public;
+#   autoindex on;
+# }
+
+# SERVER 3: file_upload
+PORT=5053
+LOG_DIR=$MYDATA/local/logs/file_upload
+mkdir -p $LOG_DIR
+cd $MYDATA/local/tmp/public
+echo "\n`date`: Starting file upload server at port $PORT." >> $LOG_DIR/file_upload.log
+python3 -u $MYDATA/git/bin-git/file_upload.py $PORT >> $LOG_DIR/file_upload.log 2>&1 &
+

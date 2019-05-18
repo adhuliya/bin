@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+if [[ -z $1 ]]; then PORT=8989; else PORT=$1; fi
+nohup python3 -u -m http.server $PORT 2>&1 >> /home/codeman/server.log &

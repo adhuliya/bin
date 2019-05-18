@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Mounts /dev/sda9 on my Asus Laptop (2019) to a fixed location
+
+cd /home/codeman
+sudo mount /dev/sda9 data-partition
+sudo chown codeman:codeman data-partition
