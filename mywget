@@ -1,0 +1,44 @@
+#!/usr/bin/env python3
+
+"""
+Utility to use `wget` to download a,
+1. single web page with all its needed resources to create its local copy
+2. a single website
+"""
+
+usage = """
+Usage:
+  mywget page <url>
+  mywget website <url>
+"""
+
+import sys
+import subprocess as subp
+
+def checkArguments():
+  if len(sys.argv) != 3:
+    print(usage)
+    exit(1)
+
+def downloadPage(page):
+  cp = subp.run(f"wget -E -H -k -K -p {page}", shell=True)
+  if cp.returncode != 0:
+    print("mywget: process finised with error code", cp.returncode, file=sys.stderr)
+
+def downloadWebsite(website):
+  # should not use -H, since the process may become Google ;)
+  cp = subp.run(f"wget -r -E -k -K -p --level=7 {website}", shell=True)
+  if cp.returncode != 0:
+    print("mywget: process finised with error code", cp.returncode, file=sys.stderr)
+
+if __name__ == "__main__":
+  checkArguments()
+
+  if sys.argv[1] == "page":
+    downloadPage(sys.argv[2])
+  elif sys.argv[1] == "website":
+    downloadWebsite(sys.argv[2])
+  else:
+    print(usage)
+    exit(2)
+  
