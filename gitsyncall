@@ -13,8 +13,9 @@ fi
 # update the file database
 updatedb -l 0 -o $MLOCATE_DB;
 
+TMP_OUT_FILE=`mktemp`;
 TMP_FILE=`mktemp`;
-echo "TMP_FILE: $TMP_FILE";
+echo "TMP_FILE: $TMP_FILE, TMP_OUT_FILE: $TMP_OUT_FILE";
 
 # populate the TMP_FILE with files that end with '-git'
 locate -d $MLOCATE_DB -r "-git$" > $TMP_FILE;
@@ -28,10 +29,10 @@ while read file; do
       count=$((count+1));
       cd $file;
       echo "Syncing repo: `pwd`";
-      gitsync > /dev/null;
+      gitsync &> $TMP_OUT_FILE;
     fi
   fi
 done < $TMP_FILE;
 
-echo "Synced $count repos.\n";
+echo -e "Synced $count repos.\n";
 
