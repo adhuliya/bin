@@ -6,6 +6,10 @@
 
 MLOCATE_DB=$MYDATA/local/files/mlocate.db
 
+if which bkpsysconfigs; then
+  bkpsysconfigs;
+fi
+
 # update the file database
 updatedb -l 0 -o $MLOCATE_DB;
 
@@ -29,5 +33,5 @@ while read file; do
   fi
 done < $TMP_FILE;
 
-echo "Synced $count repos.";
+echo "Synced $count repos.\n";
 

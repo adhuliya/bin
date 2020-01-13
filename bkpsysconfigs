@@ -5,6 +5,8 @@
 
 # it reads $FILE_LIST_FILE for the list of files
 
+echo "bkpsysconfigs: Backing up the system config files.";
+
 HOST="`cat /proc/sys/kernel/hostname`";
 CURR_DIR="`pwd`";
 BASE_DIR="$MYDATA/git/configs-git";
