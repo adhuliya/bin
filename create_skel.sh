@@ -27,6 +27,9 @@ if [[ ! -e knotes-git ]]; then
   git clone git@github.com:adhuliya/knotes \
       && mv knotes knotes-git;
 fi
+if [[ ! -e public ]]; then
+  mkdir public;
+fi
 
 # setup MYDATA
 cd $CURRDIR;
