@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 # execute `crontab -e` as a non-root user
-# add the line: `@reboot /home/codeman/.itsoflife/git/bin-git/startup/servers`
+# add the line: `@reboot /home/codeman/.itsoflife/mydata/git/bin-git/startup/servers`
 
-MYDATA=/home/codeman/.itsoflife
+MYDATA=/home/codeman/.itsoflife/mydata
 
 # SERVER 1: tiddlywiki
 # Pre-requisites/ dependencies for tiddlywiki server:

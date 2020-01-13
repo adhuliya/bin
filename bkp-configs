@@ -44,9 +44,6 @@ def main():
   filelist = readFileList(FILE_LIST_FILE)
   copy(filelist)
 
-
 if __name__ == "__main__":
-
   main()
-
 

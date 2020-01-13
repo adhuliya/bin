@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+# execute `crontab -e` as a non-root user
+# add the line: `@reboot /home/codeman/.itsoflife/mydata/git/bin-git/startup/tasks`
+
+MYDATA=/home/codeman/.itsoflife
+
+# update apt-file
+sudo apt-file update
+
+# update locate database
+sudo updatedb
+
+# copy all system files

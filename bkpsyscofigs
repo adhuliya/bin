@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+
+# Assumes MYDATA and HOST are set properly
+# ??: for some reashon $HOST is empty here (even though its not in the terminal)
+
+# it reads $FILE_LIST_FILE for the list of files
+
+HOST="`cat /proc/sys/kernel/hostname`";
+CURR_DIR="`pwd`";
+BASE_DIR="$MYDATA/git/configs-git";
+DEST_DIR="$BASE_DIR/sys-files/$HOST";
+FILE_LIST_FILE="$DEST_DIR/sys-files.list";
+count=0
+
+cd "$DEST_DIR";
+
+while read file; do
+  # a neat trick (avoids blank lines and comments)
+  if [[ ${file:0:1} == "/" ]]; then  # thus a path
+    if [[ -e "$file" ]]; then
+      DIRNAME="$( dirname "$file" )";
+      FILENAME="$( basename "$file" )";
+      RELATIVE_DIR="${DIRNAME:1}";
+      DESTINATION_FILE="$RELATIVE_DIR/$FILENAME";
+      mkdir -p "${RELATIVE_DIR}";
+
+      if [[ -f $file ]]; then
+        if [[ $DESTINATION_FILE -ot $file ]]; then
+          echo "Copying (file): '$file'";
+          cp -r "${file}" "${RELATIVE_DIR}"; 
+          count=$((count+1));
+        else
+          echo "Latest  (file): '$file'";
+        fi
+      else
+        echo "Copying  (dir): '$file'";
+        cp -r "${file}" "${RELATIVE_DIR}"; 
+        count=$((count+1));
+      fi
+    else
+      echo "  DoesNotExist: '$file'";
+    fi
+  fi
+done < "$FILE_LIST_FILE";
+
+echo "Copied $count files/directories.";
+
+cd "$CURR_DIR";
+
