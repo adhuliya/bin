@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+# execute `sudo crontab`
+# add the line:
+# @reboot /home/codeman/.itsoflife/mydata/git/bin-git/startup/system-startup.root
+
+MYDATA=/home/codeman/.itsoflife/mydata
+
+echo "$(date) system-startup.root" >> $MYDATA/local/logs/mysystem.log
+
+#add the tasks to execute below
+
+# update apt-file
+apt-file update
+
+# update locate database
+updatedb
+

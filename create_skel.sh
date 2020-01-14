@@ -31,7 +31,7 @@ if [[ ! -e public ]]; then
   mkdir public;
 fi
 
-# setup MYDATA
+# setup mydata
 cd $CURRDIR;
 mkdir -p $MYDATA/git
 mkdir -p $MYDATA/local
@@ -55,12 +55,13 @@ cd $CURRDIR;
 
 # setup local directory tree
 cd $CURRDIR;
-mkdir -p $MYDATA/local/logs
-mkdir -p $MYDATA/local/ssd
-mkdir -p $MYDATA/local/extra-partition
-mkdir -p $MYDATA/local/packages
-mkdir -p $MYDATA/local/packages-live
-mkdir -p $MYDATA/local/downloads
+mkdir -p $MYDATA/local/logs;
+mkdir -p $MYDATA/local/ssd;
+mkdir -p $MYDATA/local/extra-partition;
+mkdir -p $MYDATA/local/packages;
+mkdir -p $MYDATA/local/packages-live;
+mkdir -p $MYDATA/local/downloads;
+mkdir -p $MYDATA/local/tmp;
 if [[ ! -L ~/Downloads ]]; then
   if [[ -e ~/Downloads ]]; then
     mv ~/Downloads ~/Downloads-old;
