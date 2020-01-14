@@ -8,7 +8,12 @@
 BEFORE_COMMIT=before_commit.sh
 if [[ -e $BEFORE_COMMIT ]]; then
   echo "  Running $BEFORE_COMMIT script.";
-  bash $BEFORE_COMMIT;
+  if bash $BEFORE_COMMIT; then
+    echo "    Successful $BEFORE_COMMIT";
+  else
+    echo "    ERROR:     $BEFORE_COMMIT failed";
+    exit 1;
+  fi
 else
   echo "  No $BEFORE_COMMIT script present.";
 fi
@@ -21,14 +26,14 @@ OUTPUT=$(git status --short)
 if [[ ! -z $OUTPUT ]]; then
   echo -e "AD: GIT STATUS: Uncommitted changes!!!!"
   git add --all
-  if [[ $? -ne 0 ]]; then exit 1; fi
+  if [[ $? -ne 0 ]]; then echo "ERROR: in adding"; exit 2; fi
 
   if [ "$1" == "" ]; then
     git commit -m 'semi-automated-update'
-    if [[ $? -ne 0 ]]; then exit 2; fi
+    if [[ $? -ne 0 ]]; then echo "ERROR: in commiting"; exit 3; fi
   else
     git commit -m "$1"
-    if [[ $? -ne 0 ]]; then exit 3; fi
+    if [[ $? -ne 0 ]]; then echo "ERROR: in commiting"; exit 4; fi
   fi
 else
   echo -e "AD: GIT STATUS: OK"
@@ -39,7 +44,7 @@ fi
 
 echo -e "\nAD: Fetching origin/master."
 git fetch origin master
-if [[ $? -ne 0 ]]; then exit 4; fi
+if [[ $? -ne 0 ]]; then echo "ERROR: in fetching"; exit 5; fi
 
 # STEP 3: Merge and push if master and origin/master differ.
 
@@ -60,8 +65,8 @@ echo -e "\nAD: Local and Remote differ. Merging and Pushing."
 # reaches here only when any new content is present
 
 git merge -m "semi-automated-merge" origin/master
-if [[ $? -ne 0 ]]; then exit 5; fi
+if [[ $? -ne 0 ]]; then echo "ERROR: in merging"; exit 6; fi
 git push origin master
-if [[ $? -ne 0 ]]; then exit 6; fi
+if [[ $? -ne 0 ]]; then echo "ERROR: in pushing"; exit 7; fi
 
 

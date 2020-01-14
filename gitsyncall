@@ -5,14 +5,6 @@
 # Commit and sync all git repos whose directory is suffixed with `-git`
 
 MLOCATE_DB=$MYDATA/local/files/mlocate.db;
-BKPSYSCONFIG=bkpsysconfigs;
-
-if which $BKPSYSCONFIG; then
-  $BKPSYSCONFIG;
-else
-  echo "ERROR: $BKPSYSCONFIG not in path!!";
-  exit;
-fi
 
 # update the file database
 updatedb -l 0 -o $MLOCATE_DB;
@@ -22,7 +14,9 @@ TMP_FILE=`mktemp`;
 TMP_REPO_LIST=`mktemp`;
 
 echo -e "\nStarting to sync repos";
-echo -e "TMP_FILE: $TMP_FILE, TMP_OUT_FILE: $TMP_OUT_FILE";
+echo "TMP_FILE:       $TMP_FILE";
+echo "TMP_OUT_FILE:   $TMP_OUT_FILE";
+echo "TMP_REPO_LIST:  $TMP_REPO_LIST";
 
 # populate the TMP_FILE with files that end with '-git'
 locate -d $MLOCATE_DB -r "-git$" > $TMP_FILE;
@@ -42,7 +36,20 @@ while read file; do
   fi
 done < $TMP_FILE;
 
+echo -e "\n";
+echo "TMP_FILE:       $TMP_FILE";
+echo "TMP_OUT_FILE:   $TMP_OUT_FILE";
+echo "TMP_REPO_LIST:  $TMP_REPO_LIST";
+
 echo -e "\n\nRepos synced:\n";
 cat $TMP_REPO_LIST;
 echo -e "\nSynced $count repos.";
+
+# Check for errors
+errorcount="`grep ERROR: $TMP_OUT_FILE | wc -l`";
+if [[ $errorcount -ne 0 ]]; then
+  echo "ERROR: $errorcount errors.";
+else
+  echo "";
+fi
 
