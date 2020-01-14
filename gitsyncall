@@ -19,7 +19,10 @@ updatedb -l 0 -o $MLOCATE_DB;
 
 TMP_OUT_FILE=`mktemp`;
 TMP_FILE=`mktemp`;
-echo "TMP_FILE: $TMP_FILE, TMP_OUT_FILE: $TMP_OUT_FILE";
+TMP_REPO_LIST=`mktemp`;
+
+echo -e "\nStarting to sync repos";
+echo -e "TMP_FILE: $TMP_FILE, TMP_OUT_FILE: $TMP_OUT_FILE";
 
 # populate the TMP_FILE with files that end with '-git'
 locate -d $MLOCATE_DB -r "-git$" > $TMP_FILE;
@@ -31,6 +34,7 @@ while read file; do
     if [[ ${file:0:5} == "/home" ]]; then
       # must be in /home sub directory tree
       count=$((count+1));
+      echo "$file" >> $TMP_REPO_LIST;
       cd $file;
       echo -e "\n\nSyncing repo: `pwd`" |& tee -a $TMP_OUT_FILE;
       gitsync |& tee -a $TMP_OUT_FILE;
@@ -38,5 +42,7 @@ while read file; do
   fi
 done < $TMP_FILE;
 
-echo -e "Synced $count repos.\n";
+echo -e "\n\nRepos synced:\n";
+cat $TMP_REPO_LIST;
+echo -e "\nSynced $count repos.";
 
