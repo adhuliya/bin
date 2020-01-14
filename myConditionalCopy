@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+
+# Copying file: copied only if the dest file in $DEST directory
+#               (with same name) is an older copy.
+# Copying directory: recursively copies it applying the rules on file above.
+
+SRC="`realpath $1`"
+DEST="`realpath $2`"
+count=0
+
+if [[ ! -d $DEST ]]; then
+  echo "$0: ERROR: $DEST should be a directory";
+  exit 1;
+fi
+
+if [[ -d $SRC ]]; then ISDIR="yes"; else ISDIR="no"; fi
+
+SRCROOT="`dirname $SRC`";
+SRCBASENAME="`basename $SRC`";
+DESTFILE="$DEST/$SRCBASENAME";
+#DEST is already a directory
+
+if [[ $ISDIR == "no" ]]; then
+  # not a directory
+  if [[ ! -e $DESTFILE || $SRC -nt $DESTFILE ]]; then
+    cp $SRC $DEST;  # force a copy
+    echo "Copied  (file): $SRC";
+    count=$((count+1));
+  else
+    echo "Latest  (file): $SRC";
+  fi
+fi
+
+if [[ $ISDIR == "yes" ]]; then
+  # a directory
+  TMP_FILE=`mktemp /dev/shm/mytmp.XXXXXXXX`;
+  echo "TMP_FILE: $TMP_FILE";
+  cd $SRCROOT;  # IMPORTANT
+  find $SRCBASENAME > $TMP_FILE;  # all the files in the SRC dir (including the dir)
+
+  while read line; do
+    if [[ -d $SRCROOT/$line ]]; then ISDIR1="yes"; else ISDIR1="no"; fi
+
+    if [[ $ISDIR1 == "yes" ]]; then
+      # a directory
+      if [[ ! -e $DEST/$line ]]; then
+        cp -r $SRCROOT/$line $DEST/$line;
+        echo "Copied  (dir) : $SRCROOT/$line";
+        count=$((count+1));
+      fi
+
+    else
+      # not a directory
+      if [[ ! -e $DEST/$line || $SRCROOT/$line -nt $DEST/$line ]]; then
+        cp $SRCROOT/$line $DEST/$line;
+        echo "Copied  (file): $SRCROOT/$line";
+        count=$((count+1));
+      else
+        echo "Latest  (file): $SRCROOT/$line";
+      fi
+    fi
+  done < $TMP_FILE;
+
+  rm $TMP_FILE;  # IMPORTANT
+fi
+
+#echo -e "\nCopied $count files/directories.";

@@ -16,36 +16,26 @@ count=0
 
 cd "$DEST_DIR";
 
-while read file; do
+while read line; do
   # a neat trick (avoids blank lines and comments)
-  if [[ ${file:0:1} == "/" ]]; then  # thus a path
-    if [[ -e "$file" ]]; then
-      DIRNAME="$( dirname "$file" )";
-      FILENAME="$( basename "$file" )";
+  if [[ ${line:0:1} == "/" ]]; then  # thus a path
+    if [[ -e "$line" ]]; then
+      DIRNAME="$( dirname "$line" )";
       RELATIVE_DIR="${DIRNAME:1}";
-      DESTINATION_FILE="$RELATIVE_DIR/$FILENAME";
+
       mkdir -p "${RELATIVE_DIR}";
 
-      if [[ -f $file ]]; then
-        if [[ $DESTINATION_FILE -ot $file ]]; then
-          echo "Copying (file): '$file'";
-          cp -r "${file}" "${RELATIVE_DIR}"; 
-          count=$((count+1));
-        else
-          echo "Latest  (file): '$file'";
-        fi
-      else
-        echo "Copying  (dir): '$file'";
-        cp -r "${file}" "${RELATIVE_DIR}"; 
-        count=$((count+1));
-      fi
+      CURR_DEST_DIR="$DEST_DIR/$RELATIVE_DIR";
+
+      myConditionalCopy $line $CURR_DEST_DIR;
     else
-      echo "  DoesNotExist: '$file'";
+      echo "DoesNotExist  : '$line'";
     fi
   fi
 done < "$FILE_LIST_FILE";
 
-echo "Copied $count files/directories.";
+#echo "Copied $count files/directories.";
+
 
 cd "$CURR_DIR";
 

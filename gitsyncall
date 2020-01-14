@@ -9,9 +9,9 @@ MLOCATE_DB=$MYDATA/local/files/mlocate.db;
 # update the file database
 updatedb -l 0 -o $MLOCATE_DB;
 
-TMP_OUT_FILE=`mktemp`;
-TMP_FILE=`mktemp`;
-TMP_REPO_LIST=`mktemp`;
+TMP_OUT_FILE=`mktemp /dev/shm/tmp.XXXXXXXX`;
+TMP_FILE=`mktemp /dev/shm/tmp.XXXXXXXX`;
+TMP_REPO_LIST=`mktemp /dev/shm/tmp.XXXXXXXX`;
 
 echo -e "\nStarting to sync repos";
 echo "TMP_FILE:       $TMP_FILE";
@@ -36,14 +36,18 @@ while read file; do
   fi
 done < $TMP_FILE;
 
-echo -e "\n";
-echo "TMP_FILE:       $TMP_FILE";
-echo "TMP_OUT_FILE:   $TMP_OUT_FILE";
-echo "TMP_REPO_LIST:  $TMP_REPO_LIST";
-
 echo -e "\n\nRepos synced:\n";
 cat $TMP_REPO_LIST;
 echo -e "\nSynced $count repos.";
+
+# remove all tmp files except $TMP_OUT_FILE
+if [[ -e $TMP_FILE ]]; then rm $TMP_FILE; fi
+if [[ -e $TMP_REPO_LIST ]]; then rm $TMP_REPO_LIST; fi
+
+echo -e "\n";
+echo "TMP_FILE:       $TMP_FILE (removed)";
+echo "TMP_REPO_LIST:  $TMP_REPO_LIST (removed)";
+echo "TMP_OUT_FILE:   $TMP_OUT_FILE (remove it manually)";
 
 # Check for errors
 errorcount="`grep ERROR: $TMP_OUT_FILE | wc -l`";
