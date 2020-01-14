@@ -4,18 +4,37 @@
 
 # Commit and Sync the changes of local git repo with the remote.
 
-# STEP 0: Run the $BEFORE_COMMIT script if present
-BEFORE_COMMIT=before_commit.sh
-if [[ -e $BEFORE_COMMIT ]]; then
-  echo "  Running $BEFORE_COMMIT script.";
-  if bash $BEFORE_COMMIT; then
-    echo "    Successful $BEFORE_COMMIT";
+# STEP 0: Run the $BEFORE_COMMIT_SCRIPT script if present
+BEFORE_COMMIT_SCRIPT=before_commit.sh;
+SCRIPT_PRESENT="no";
+
+#    find the parent which has a the `.git` folder
+ABS_PATH="`realpath .`";
+TMP_PATH=$ABS_PATH;
+for x in {1..20}; do    # just loop enough no. of times
+  if [[ -d $TMP_PATH/.git ]]; then
+    # a git repository
+    if [[ -e $TMP_PATH/$BEFORE_COMMIT_SCRIPT ]]; then
+      SCRIPT_PRESENT="yes";
+    fi
+    break;
   else
-    echo "    ERROR:     $BEFORE_COMMIT failed";
+    TMP_PATH="`dirname $TMP_PATH`";
+  fi
+done
+
+#    now execute the script if found
+cd $TMP_PATH; # go to the directory containing the script
+if [[ $SCRIPT_PRESENT == "yes" ]]; then
+  echo "  Running $BEFORE_COMMIT_SCRIPT script.";
+  if bash $BEFORE_COMMIT_SCRIPT; then
+    echo "    Successful $TMP_PATH/$BEFORE_COMMIT_SCRIPT";
+  else
+    echo "    ERROR:     $TMP_PATH/$BEFORE_COMMIT_SCRIPT failed";
     exit 1;
   fi
 else
-  echo "  No $BEFORE_COMMIT script present.";
+  echo "  NotPresent: $TMP_PATH/$BEFORE_COMMIT_SCRIPT ";
 fi
 
 
