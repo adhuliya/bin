@@ -1,16 +1,14 @@
 #!/usr/bin/env bash
 
-# startup programs for lxde
-# add symlink to this file in the ~/.config/autostart folder:
-# ln -s $MYDATA/git/bin-git/startup/lxde-startup.sh lxde-startup.sh
+# startup script for lxde
+# see mylxde-startup.desktop
 
 MYDATA=/home/codeman/.itsoflife/mydata
 
 echo "$(date) lxde-startup.sh" >> $MYDATA/local/logs/mysystem.log
 
-#add the tasks to execute below
-
-nohup pcmanfm &> /dev/null &;
+# add the tasks to execute below (no gui progrms)
+# For gui programs use a separate .desktop file
 
 # sleep 1;
 # pcmanfm --desktop-off

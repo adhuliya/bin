@@ -1,0 +1,16 @@
+[Desktop Entry] 
+
+# put a symbolic link to this file in .config/autostart folder
+
+Type=Application
+
+# A comment which can/will be used as a tooltip
+Comment=My Startup script
+
+Exec=/home/codeman/.itsoflife/mydata/git/bin-git/startup/lxde-startup.sh
+
+# Describes whether this application needs to be run in a terminal or not (true/false)
+Terminal=true
+
+# The name of the icon that will be used to display this entry
+#Icon=jmemorize
