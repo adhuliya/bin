@@ -4,6 +4,16 @@
 
 # Commit and Sync the changes of local git repo with the remote.
 
+# STEP 0: Run the $BEFORE_COMMIT script if present
+BEFORE_COMMIT=before_commit.sh
+if [[ -e $BEFORE_COMMIT ]]; then
+  echo "  Running $BEFORE_COMMIT script.";
+  bash $BEFORE_COMMIT;
+else
+  echo "  No $BEFORE_COMMIT script present.";
+fi
+
+
 # STEP 1: Commit locally if needed.
 
 OUTPUT=$(git status --short)
