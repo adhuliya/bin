@@ -4,10 +4,14 @@
 #
 # Commit and sync all git repos whose directory is suffixed with `-git`
 
-MLOCATE_DB=$MYDATA/local/files/mlocate.db
+MLOCATE_DB=$MYDATA/local/files/mlocate.db;
+BKPSYSCONFIG=bkpsysconfigs;
 
-if which bkpsysconfigs; then
-  bkpsysconfigs;
+if which $BKPSYSCONFIG; then
+  $BKPSYSCONFIG;
+else
+  echo "ERROR: $BKPSYSCONFIG not in path!!";
+  exit;
 fi
 
 # update the file database
@@ -28,8 +32,8 @@ while read file; do
       # must be in /home sub directory tree
       count=$((count+1));
       cd $file;
-      echo "Syncing repo: `pwd`";
-      gitsync &> $TMP_OUT_FILE;
+      echo -e "\n\nSyncing repo: `pwd`" |& tee -a $TMP_OUT_FILE;
+      gitsync |& tee -a $TMP_OUT_FILE;
     fi
   fi
 done < $TMP_FILE;
