@@ -1,7 +1,0 @@
-#!/usr/bin/env zsh
-
-while true; do
-  echo "its: $1"
-  sleep 2;
-done;
-

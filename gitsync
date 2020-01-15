@@ -10,33 +10,44 @@ SCRIPT_PRESENT="no";
 
 #    find the parent which has a the `.git` folder
 ABS_PATH="`realpath .`";
-TMP_PATH=$ABS_PATH;
+GIT_REPO_PATH=$ABS_PATH;
 for x in {1..20}; do    # just loop enough no. of times
-  if [[ -d $TMP_PATH/.git ]]; then
+  if [[ -d $GIT_REPO_PATH/.git ]]; then
     # a git repository
-    if [[ -e $TMP_PATH/$BEFORE_COMMIT_SCRIPT ]]; then
+    if [[ -e $GIT_REPO_PATH/$BEFORE_COMMIT_SCRIPT ]]; then
       SCRIPT_PRESENT="yes";
     fi
     break;
   else
-    TMP_PATH="`dirname $TMP_PATH`";
+    GIT_REPO_PATH="`dirname $GIT_REPO_PATH`";
   fi
 done
 
+# IMPORTANT: cd into the root git repo directory
+cd $GIT_REPO_PATH; # go to the directory containing the script
+echo "In GitRepo: $GIT_REPO_PATH";
+
 #    now execute the script if found
-cd $TMP_PATH; # go to the directory containing the script
 if [[ $SCRIPT_PRESENT == "yes" ]]; then
   echo "  Running $BEFORE_COMMIT_SCRIPT script.";
   if bash $BEFORE_COMMIT_SCRIPT; then
-    echo "    Successful $TMP_PATH/$BEFORE_COMMIT_SCRIPT";
+    echo "    Successful $GIT_REPO_PATH/$BEFORE_COMMIT_SCRIPT";
   else
-    echo "    ERROR:     $TMP_PATH/$BEFORE_COMMIT_SCRIPT failed";
+    echo "    ERROR:     $GIT_REPO_PATH/$BEFORE_COMMIT_SCRIPT failed";
     exit 1;
   fi
 else
-  echo "  NotPresent: $TMP_PATH/$BEFORE_COMMIT_SCRIPT ";
+  echo "  NotPresent: $GIT_REPO_PATH/$BEFORE_COMMIT_SCRIPT ";
 fi
 
+# look for Makefile and execute `make clean` if target "clean" exists
+if [[ -e $GIT_REPO_PATH/Makefile ]]; then
+  count="`egrep "^clean:" Makefile | wc -l`";
+  if [[ $count -gt 0 ]]; then
+    echo "Running 'make clean' on: $GIT_REPO_PATH";
+    make clean &> /dev/null;
+  fi
+fi
 
 # STEP 1: Commit locally if needed.
 
