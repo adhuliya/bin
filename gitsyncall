@@ -4,10 +4,17 @@
 #
 # Commit and sync all git repos whose directory is suffixed with `-git`
 
-MLOCATE_DB=$MYDATA/local/files/mlocate.db;
-
 # update the file database
-updatedb -l 0 -o $MLOCATE_DB;
+if [[ -z $MYMLOCATEDB ]]; then
+  echo "$0: ERROR: MYMLOCATEDB env var not set properly!";
+else
+  if [[ -e "`dirname $MYMLOCATEDB`" ]]; then
+    echo "Updating mlocatedb: $MYMLOCATEDB";
+    updatedb -l 0 -o $MYMLOCATEDB;
+  else
+    echo "$0: ERROR: directory does not exist `dirname $MYMLOCATEDB`";
+  fi
+fi
 
 TMP_OUT_FILE=`mktemp /dev/shm/tmp.XXXXXXXX`;
 TMP_FILE=`mktemp /dev/shm/tmp.XXXXXXXX`;
@@ -19,7 +26,7 @@ echo "TMP_OUT_FILE:   $TMP_OUT_FILE";
 echo "TMP_REPO_LIST:  $TMP_REPO_LIST";
 
 # populate the TMP_FILE with files that end with '-git'
-locate -d $MLOCATE_DB -r "-git$" > $TMP_FILE;
+locate -d $MYMLOCATEDB -r "-git$" > $TMP_FILE;
 
 count=0
 while read file; do
@@ -30,7 +37,7 @@ while read file; do
       count=$((count+1));
       echo "$file" >> $TMP_REPO_LIST;
       cd $file;
-      echo -e "\n\nSyncing repo: `pwd`" |& tee -a $TMP_OUT_FILE;
+      echo -e "\n\nSyncing repo (*****): `pwd`" |& tee -a $TMP_OUT_FILE;
       gitsync |& tee -a $TMP_OUT_FILE;
     fi
   fi
