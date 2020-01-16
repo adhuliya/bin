@@ -7,6 +7,7 @@
 # STEP 0: Run the $BEFORE_COMMIT_SCRIPT script if present
 BEFORE_COMMIT_SCRIPT=before_commit.sh;
 SCRIPT_PRESENT="no";
+DEAD_REPO_FILE="DEAD_REPO.md";
 
 #    find the parent which has a the `.git` folder
 ABS_PATH="`realpath .`";
@@ -23,8 +24,20 @@ for x in {1..20}; do    # just loop enough no. of times
   fi
 done
 
+if [[ $x -eq 20 ]]; then
+  echo "$0: ERROR: No git repo found till the root";
+  exit 1;
+fi
+
 # IMPORTANT: cd into the root git repo directory
 cd $GIT_REPO_PATH; # go to the directory containing the script
+
+# IMPORTANT: if $DEAD_REPO_FILE is present then quit.
+if [[ -e $DEAD_REPO_FILE ]]; then
+  echo "Quitting: $GIT_REPO_PATH/$DEAD_REPO_FILE present. OK.";
+  exit 0; # no error
+fi
+
 echo "In GitRepo: $GIT_REPO_PATH";
 
 #    now execute the script if found
@@ -34,7 +47,7 @@ if [[ $SCRIPT_PRESENT == "yes" ]]; then
     echo "    Successful $GIT_REPO_PATH/$BEFORE_COMMIT_SCRIPT";
   else
     echo "    ERROR:     $GIT_REPO_PATH/$BEFORE_COMMIT_SCRIPT failed";
-    exit 1;
+    exit 3;
   fi
 else
   echo "  NotPresent: $GIT_REPO_PATH/$BEFORE_COMMIT_SCRIPT ";
@@ -56,14 +69,14 @@ OUTPUT=$(git status --short)
 if [[ ! -z $OUTPUT ]]; then
   echo -e "AD: GIT STATUS: Uncommitted changes!!!!"
   git add --all
-  if [[ $? -ne 0 ]]; then echo "ERROR: in adding"; exit 2; fi
+  if [[ $? -ne 0 ]]; then echo "ERROR: in adding"; exit 5; fi
 
   if [ "$1" == "" ]; then
     git commit -m 'semi-automated-update'
-    if [[ $? -ne 0 ]]; then echo "ERROR: in commiting"; exit 3; fi
+    if [[ $? -ne 0 ]]; then echo "ERROR: in commiting"; exit 10; fi
   else
     git commit -m "$1"
-    if [[ $? -ne 0 ]]; then echo "ERROR: in commiting"; exit 4; fi
+    if [[ $? -ne 0 ]]; then echo "ERROR: in commiting"; exit 15; fi
   fi
 else
   echo -e "AD: GIT STATUS: OK"
@@ -74,7 +87,7 @@ fi
 
 echo -e "\nAD: Fetching origin/master."
 git fetch origin master
-if [[ $? -ne 0 ]]; then echo "ERROR: in fetching"; exit 5; fi
+if [[ $? -ne 0 ]]; then echo "ERROR: in fetching"; exit 20; fi
 
 # STEP 3: Merge and push if master and origin/master differ.
 
@@ -86,7 +99,7 @@ if [[ -n "$OUTPUT" ]]; then
   OUTPUT=$(git diff master origin/master)
   if [[ -z $OUTPUT ]]; then
      echo "Local state matches origin/master"
-     exit
+     exit 0; # no error
   fi
 fi
 
@@ -95,8 +108,8 @@ echo -e "\nAD: Local and Remote differ. Merging and Pushing."
 # reaches here only when any new content is present
 
 git merge -m "semi-automated-merge" origin/master
-if [[ $? -ne 0 ]]; then echo "ERROR: in merging"; exit 6; fi
+if [[ $? -ne 0 ]]; then echo "ERROR: in merging"; exit 25; fi
 git push origin master
-if [[ $? -ne 0 ]]; then echo "ERROR: in pushing"; exit 7; fi
+if [[ $? -ne 0 ]]; then echo "ERROR: in pushing"; exit 30; fi
 
 
