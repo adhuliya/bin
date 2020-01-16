@@ -12,6 +12,8 @@ echo "$(date) myshutdown.sh start" >> $MYDATA/local/logs/mysystem.log
 
 gitsyncall;
 
+datasync;
+
 #BOUND END   : addCommandsToRun
 
 ############## take final permission to shutdown

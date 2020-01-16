@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+# This script syncs the $MYDATA/important-data folder on my hard disk
+# to the current backup server.
+# NOTE: adding ssh key to the remote server is helpful.
+
+SRC_LOCATION="$MYDATA/important-data/";
+BKP_LOCATION="codeman@10.130.168.6:.itsoflife/important-data";
+
+#SRC_LOCATION="$MYDATA/test-data/";
+#BKP_LOCATION="codeman@10.130.168.6:.itsoflife/test-data";
+
+echo -e "\n\nSyncing important-data:";
+echo -e "\nExecuting: rsync -avz --partial --progress -e ssh $SRC_LOCATION $BKP_LOCATION"
+
+rsync -avz --partial --progress -e ssh $SRC_LOCATION $BKP_LOCATION;
