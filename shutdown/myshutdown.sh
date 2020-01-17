@@ -17,7 +17,7 @@ datasync;
 #BOUND END   : addCommandsToRun
 
 ############## take final permission to shutdown
-echo -n "Shall I shutdown? (y/n) ";
+echo -en "\nShall I shutdown? (y/n) ";
 read response;
 if [[ $response == "y" || $response == "Y" ]]; then
   ############## power off !!!!!!!!!
