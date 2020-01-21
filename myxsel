@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+FILE_NAME=$ITSOFLIFE/knotes-git/clipboard.txt
+
+echo "" >> $FILE_NAME
+xsel >> $FILE_NAME
+echo "" >> $FILE_NAME
