@@ -36,7 +36,7 @@ while read file; do
       # must be in /home sub directory tree
       count=$((count+1));
       echo "$file" >> $TMP_REPO_LIST;
-      cd $file;
+      cd $file; # IMPORTANT
       echo -e "\n\nSyncing repo (*****): `pwd`" |& tee -a $TMP_OUT_FILE;
       gitsync |& tee -a $TMP_OUT_FILE;
     fi

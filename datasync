@@ -4,20 +4,13 @@
 # to the current backup server.
 # NOTE: adding ssh key to the remote server is helpful.
 
-# STEP 1: Backup the git/ folder (TODO)
-
-SRC_GIT_REPOS="$MYDATA/git/";
-LOCAL_BKP_LOCATION="$MYDATA/important-data";
-
-# STEP 2: Backup the data folder
+# Backup the data folder
 
 SRC_LOCATION="$MYDATA/important-data/";
 BKP_LOCATION="codeman@10.130.168.6:.itsoflife/important-data";
-
-#SRC_LOCATION="$MYDATA/test-data/";
-#BKP_LOCATION="codeman@10.130.168.6:.itsoflife/test-data";
 
 echo -e "\n\nSyncing important-data:";
 echo -e "\nExecuting: rsync -avz --partial --progress -e ssh $SRC_LOCATION $BKP_LOCATION"
 
 rsync -avz --partial --progress -e ssh $SRC_LOCATION $BKP_LOCATION;
+
