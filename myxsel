@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+#DependsOn: xsel
+#KeyboardShortcut: Mod-V
+
+# Copies the text highlighted by the mouse into $FILE_NAME
+
 FILE_NAME=$ITSOFLIFE/knotes-git/clipboard.txt
 
 echo "" >> $FILE_NAME

@@ -11,9 +11,12 @@ and you are done.
 Author: Anshuman Dhuliya (anshumandhuliya@gmail.com)
 """
 
-import bottle
 import os
 import sys
+
+scriptPath=os.path.dirname(os.path.realpath(__file__))
+sys.path.append(f"{scriptPath}/mylib") # for local copy of bottle
+import bottle
 
 HOST = "0.0.0.0" # serve on all interfaces
 PORT = 5053
@@ -52,7 +55,7 @@ def index():
   </head>
   <body style="max-width:768px;margin:auto;">
   <h2>Upload Files (at most 3 at a time).</h2>
-  <h4>Naming the files meaningfully will immensely help us in its identification.</h4>
+  <h4>Please give meaningful name to the file.</h4>
     <form action="/upload" method="post" enctype="multipart/form-data">
       <input class="button2" type="file" name="upload1" required/> (required)<br/>
       <input class="button1" type="file" name="upload2" /><br/>
@@ -117,7 +120,7 @@ def do_upload():
 
   return page.format(main_content='<br\>\n'.join(response))
 
-#bottle.run(host=HOST, port=PORT, server='cgi')
-bottle.run(server='cgi')
+bottle.run(host=HOST, port=PORT)
+#bottle.run(server='cgi')
 
 

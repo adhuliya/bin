@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+# outputs given number of bytes
+# NOTE: use dd if=... of=... bs=1024 count=<kb-count>
+
 import sys
 import re
 

@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 
+#DependsOn: pyxhook   `pip3 install pyxhook`
+
 import pyxhook # needs install via sudo pip3 install pyxhook
 import time
 import os
 import os.path as osp
 
 #change this to your log file's path
-logFileDir = ".itsoflife/local/logs/keylogger"
+logFileDir = ".itsoflife/mydata/local/logs/keylogger"
 logFile = "keyloggfile.log"
 
 PAUSE_TIME = 5

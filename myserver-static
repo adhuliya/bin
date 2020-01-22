@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+# starts a static python server: takes PORT as the only argument
+
+LOG_DIR=$MYDATA/local/logs
+LOG_FILE=myserver-static.log
+
+echo -e "\n\n(`date`)      STARTED_MYSERVER_STATIC\n" >> $LOG_DIR/$LOG_FILE &
+
+if [[ -z $1 ]]; then
+  PORT=5054;
+else
+  PORT=$1; fi
+
+echo "Starting python3 http.server at port: 0.0.0.0:$PORT";
+
+python3 -u -m http.server --bind 0.0.0.0 $PORT |& tee -a $LOG_DIR/$LOG_FILE

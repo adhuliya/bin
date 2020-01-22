@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# its better to use rsync utility
+
+# Copies $SRC file/directory to the $DEST directory if the copy is older
+
 # Copying file: copied only if the dest file in $DEST directory
 #               (with same name) is an older copy.
 # Copying directory: recursively copies it applying the rules on file above.
