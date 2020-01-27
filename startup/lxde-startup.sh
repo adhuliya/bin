@@ -7,7 +7,7 @@ MYDATA=/home/codeman/.itsoflife/mydata
 
 echo "$(date) lxde-startup.sh" >> $MYDATA/local/logs/mysystem.log
 
-# add the tasks to execute below (no gui progrms)
+# add the tasks to execute below (no gui programs)
 # For gui programs use a separate .desktop file
 
 # sleep 1;
