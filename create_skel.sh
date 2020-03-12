@@ -13,7 +13,7 @@ _ITSOFLIFE=$ITSOFLIFE
 _MYDATA=$MYDATA
 MYHOME="`dirname $_ITSOFLIFE`";
 
-echo "MYHOME is: $MYHOME";
+echo "HOME is: $MYHOME";
 
 # some redundancies are deliberate
 
