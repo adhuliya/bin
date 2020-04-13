@@ -3,10 +3,10 @@
 #DependsOn: xsel
 #KeyboardShortcut: Mod-V
 
-# Copies the text highlighted by the mouse into $FILE_NAME
+# Copies the text highlighted by the mouse into $CLIPBOARD_FILE
 
-FILE_NAME=$ITSOFLIFE/knotes-git/clipboard.txt
+CLIPBOARD_FILE=$ITSOFLIFE/knotes-git/clipboard.txt;
 
-echo "" >> $FILE_NAME
-xsel >> $FILE_NAME
-echo "" >> $FILE_NAME
+#echo ""  >> $CLIPBOARD_FILE;
+xsel      >> $CLIPBOARD_FILE;
+echo ""   >> $CLIPBOARD_FILE;
