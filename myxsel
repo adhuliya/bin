@@ -5,7 +5,7 @@
 
 # Copies the text highlighted by the mouse into $CLIPBOARD_FILE
 
-CLIPBOARD_FILE=$ITSOFLIFE/knotes-git/clipboard.txt;
+CLIPBOARD_FILE=$ITSOFLIFE/knots-git/clipboard.txt;
 
 #echo ""  >> $CLIPBOARD_FILE;
 xsel      >> $CLIPBOARD_FILE;

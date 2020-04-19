@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Puts a single line text given as command line argument in to $CLIPBOARD_FILE
 
-CLIPBOARD_FILE=$ITSOFLIFE/knotes-git/clipboard.txt
+CLIPBOARD_FILE=$ITSOFLIFE/knots-git/clipboard.txt
 
 if [[ -z "$@" ]]; then                    # argument: None: open file
   vi + $CLIPBOARD_FILE;
