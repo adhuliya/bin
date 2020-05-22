@@ -16,14 +16,20 @@ datasync;
 
 #BOUND END   : addCommandsToRun
 
-############## take final permission to shutdown
-echo -en "\nShall I shutdown? (y/n) ";
-read response;
-if [[ $response == "y" || $response == "Y" ]]; then
-  ############## power off !!!!!!!!!
-  echo "$(date) myshutdown.sh end BYE!!" >> $MYDATA/local/logs/mysystem.log
-  poweroff
-fi
+############### shutdown with a delay
+DELAY=10
+echo -en "\nShutting down in $DELAY seconds";
+sleep $DELAY;
+poweroff
+
+############### take final permission to shutdown
+#echo -en "\nShall I shutdown? (y/n) ";
+#read response;
+#if [[ $response == "y" || $response == "Y" ]]; then
+#  ############## power off !!!!!!!!!
+#  echo "$(date) myshutdown.sh end BYE!!" >> $MYDATA/local/logs/mysystem.log
+#  poweroff
+#fi
 
 
 
