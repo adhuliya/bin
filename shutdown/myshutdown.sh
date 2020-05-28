@@ -20,7 +20,8 @@ datasync;
 DELAY=10
 echo -en "\nShutting down in $DELAY seconds";
 sleep $DELAY;
-poweroff
+poweroff;
+poweroff;
 
 ############### take final permission to shutdown
 #echo -en "\nShall I shutdown? (y/n) ";
