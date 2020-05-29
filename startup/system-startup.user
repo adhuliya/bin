@@ -4,8 +4,8 @@
 # add the line:
 # @reboot /home/codeman/.itsoflife/mydata/git/bin-git/startup/system-startup.user
 
-MYDATA=/home/codeman/.itsoflife/mydata
+MYDATA=/home/codeman/.itsoflife/mydata;
 
-echo "$(date) system-startup.user" >> $MYDATA/local/logs/mysystem.log
+echo "$(date) system-startup.user" >> $MYDATA/local/logs/mysystem.log;
 
 #add the tasks to execute below

@@ -4,15 +4,18 @@
 # add the line:
 # @reboot /home/codeman/.itsoflife/mydata/git/bin-git/startup/system-startup.root
 
-MYDATA=/home/codeman/.itsoflife/mydata
+MYDATA=/home/codeman/.itsoflife/mydata;
 
-echo "$(date) system-startup.root" >> $MYDATA/local/logs/mysystem.log
+echo "$(date) system-startup.root" >> $MYDATA/local/logs/mysystem.log;
 
 #add the tasks to execute below
 
 # update apt-file
-apt-file update
+apt-file update;
 
 # update locate database
-updatedb
+updatedb;
+
+# start uwsgi server
+/usr/local/bin/uwsgi --emperor /etc/uwsgi/vassals --uid www-data --gid www-data --daemonize /var/log/uwsgi-emperor.log;
 
