@@ -80,6 +80,7 @@ if [[ ! -z $OUTPUT ]]; then
   fi
 else
   echo -e "AD: GIT STATUS: OK"
+  exit 0;
 fi
 
 
