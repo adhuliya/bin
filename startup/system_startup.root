@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+
+# execute `sudo crontab`
+# add the line:
+# @reboot /home/codeman/.itsoflife/mydata/git/bin-git/startup/system_startup.root
+
+NAME="system_startup.root";  # this file's name
+MYDATA=/home/codeman/.itsoflife/mydata;
+LOGFILE=$MYDATA/local/logs/mysystem.log;
+MYMLOCATEDB=/home/codeman/.itsoflife/mydata/local/files/mlocate.db;
+
+function runAndLog {
+  arr=("$@");
+  echo "$NAME: $(date) executing: ${arr[@]}" &>> $LOGFILE;
+  "${arr[@]}" &>> $LOGFILE;
+}
+
+# start
+runAndLog echo started;
+
+#add the tasks to execute below
+
+# update apt-file
+runAndLog apt-file update;
+
+# update locate database
+runAndLog updatedb;  # system's default
+runAndLog updatedb -l 0 -o $MYMLOCATEDB; # mycustom location
+
+# # start uwsgi server
+# /usr/local/bin/uwsgi --emperor /etc/uwsgi/vassals --uid www-data --gid www-data --daemonize /var/log/uwsgi-emperor.log;
+
+# start docker server
+runAndLog echo Invoking docker script;
+source /home/codeman/.itsoflife/mydata/git/ws/mysite-git/scripts/dev_server;
+
+cd /home/codeman/.itsoflife/mydata/git/ws/mysite-git/scripts;
+runAndLog /home/codeman/.itsoflife/mydata/git/ws/mysite-git/scripts/run.sh;
+
+# end
+runAndLog echo ended;
