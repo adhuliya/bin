@@ -21,21 +21,19 @@ runAndLog echo started;
 #add the tasks to execute below
 
 # update apt-file
-runAndLog apt-file update;
+# runAndLog apt-file update;
 
-# update locate database
-runAndLog updatedb;  # system's default
-runAndLog updatedb -l 0 -o $MYMLOCATEDB; # mycustom location
-
-# # start uwsgi server
-# /usr/local/bin/uwsgi --emperor /etc/uwsgi/vassals --uid www-data --gid www-data --daemonize /var/log/uwsgi-emperor.log;
+# # update locate database
+# runAndLog updatedb;  # system's default
+# runAndLog updatedb -l 0 -o $MYMLOCATEDB; # mycustom location
 
 # start docker server
 runAndLog echo Invoking docker script;
 source /home/codeman/.itsoflife/mydata/git/ws/mysite-git/scripts/dev_server;
-
 cd /home/codeman/.itsoflife/mydata/git/ws/mysite-git/scripts;
-runAndLog /home/codeman/.itsoflife/mydata/git/ws/mysite-git/scripts/run.sh;
+runAndLog ./run.sh;  # './' prefix is important
 
 # end
 runAndLog echo ended;
+
+

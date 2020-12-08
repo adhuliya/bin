@@ -68,7 +68,7 @@ def videoInFolder():
 
 def compressMp4(filename):
     print("AD: Compressing MP4 file {}".format(filename))
-    cmd = "ffmpeg -i {filename} -c:v libx264 -crf 28 -strict -2 {folder}/{filename}".format(folder=compressedFolderName, filename=filename)
+    cmd = "ffmpeg -i '{filename}' -c:v libx264 -crf 28 -strict -2 '{folder}/{filename}'".format(folder=compressedFolderName, filename=filename)
 
     cp = sub.run(cmd, shell=True)
     if cp.returncode != 0:
@@ -77,7 +77,7 @@ def compressMp4(filename):
 def compressMov(filename):
     print("AD: Compressing MOV file {}".format(filename))
 
-    cmd = "ffmpeg -i {filename} -vcodec h264 -acodec aac -strict -2 {folder}/{filename}".format(folder=compressedFolderName, filename=filename)
+    cmd = "ffmpeg -i '{filename}' -vcodec h264 -acodec aac -strict -2 '{folder}/{filename}'".format(folder=compressedFolderName, filename=filename)
 
     cp = sub.run(cmd, shell=True)
     if cp.returncode != 0:
