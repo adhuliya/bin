@@ -38,11 +38,11 @@ if [[ -e $DEAD_REPO_FILE ]]; then
   exit 0; # no error
 fi
 
-echo "In GitRepo: $GIT_REPO_PATH";
+echo "AD: GIT_REPO: $GIT_REPO_PATH";
 
 #    now execute the script if found
 if [[ $SCRIPT_PRESENT == "yes" ]]; then
-  echo "  Running $BEFORE_COMMIT_SCRIPT script.";
+  echo "AD: Running $BEFORE_COMMIT_SCRIPT script.";
   if bash $BEFORE_COMMIT_SCRIPT; then
     echo "    Successful $GIT_REPO_PATH/$BEFORE_COMMIT_SCRIPT";
   else
@@ -80,6 +80,7 @@ if [[ ! -z $OUTPUT ]]; then
   fi
 else
   echo -e "AD: GIT STATUS: OK"
+  echo "AD: GIT_REPO: $GIT_REPO_PATH (DONE: OKAY (no commit/push))";
   exit 0;
 fi
 
@@ -92,6 +93,7 @@ if git ls-remote origin; then
   echo "AD: OKAY : CONNECTION_TEST";
 else
   echo "AD: ERROR: CONNECTION_TEST"
+  echo "AD: GIT_REPO: $GIT_REPO_PATH (DONE: ERROR(s))";
   exit 1;
 fi
 
@@ -116,6 +118,8 @@ if [[ -n "$OUTPUT" ]]; then
   fi
 fi
 
+echo "AD: GIT_REPO: $GIT_REPO_PATH (DONE: NO PUSH NEEDED)";
+
 echo -e "\nAD: Local and Remote differ. Merging and Pushing."
 
 # reaches here only when any new content is present
@@ -125,4 +129,5 @@ if [[ $? -ne 0 ]]; then echo "ERROR: in merging"; exit 25; fi
 git push origin master
 if [[ $? -ne 0 ]]; then echo "ERROR: in pushing"; exit 30; fi
 
+echo "AD: GIT_REPO: $GIT_REPO_PATH (DONE: PUSHED CHANGES)";
 
