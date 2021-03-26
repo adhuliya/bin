@@ -155,9 +155,10 @@ echo -e "\nAD: Local and Remote differ. MERGE and PUSH";
 # reaches here only when any new content is present
 
 git merge -m "semi-automated-merge" origin/$_BRANCH_NAME;
-if [[ $? -ne 0 ]]; then echo "ERROR: in merging"; exit 25; fi
+if [[ $? -ne 0 ]]; then echo "AD: ERROR: $_GIT_REPO_NAME: merging error"; exit 25; fi
+
 git push; # origin master;
-if [[ $? -ne 0 ]]; then echo "ERROR: in pushing"; exit 30; fi
+if [[ $? -ne 0 ]]; then echo "AD: ERROR: $_GIT_REPO_NAME: pushing error"; exit 30; fi
 
 echo "AD: GIT_REPO: $_GIT_REPO_NAME (DONE: PUSHED CHANGES)";
 
