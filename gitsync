@@ -62,16 +62,6 @@ if [[ -e $GIT_REPO_PATH/Makefile ]]; then
   fi
 fi
 
-# STEP 0: Print urls and check connection to the remote repository.
-
-git remote get-url --all origin; # print the remote urls
-
-if git ls-remote origin; then
-  echo "AD: CONNECTION_TEST SUCCESSFUL!";
-else
-  echo "AD: CONNECTION_TEST ERROR!"
-fi
-
 # STEP 1: Commit locally if needed.
 
 OUTPUT=$(git status --short)
@@ -91,6 +81,18 @@ if [[ ! -z $OUTPUT ]]; then
 else
   echo -e "AD: GIT STATUS: OK"
   exit 0;
+fi
+
+
+# STEP 1.5: Print urls and check connection to the remote repository.
+
+git remote get-url --all origin; # print the remote urls
+
+if git ls-remote origin; then
+  echo "AD: OKAY : CONNECTION_TEST";
+else
+  echo "AD: ERROR: CONNECTION_TEST"
+  exit 1;
 fi
 
 
