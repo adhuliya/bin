@@ -6,21 +6,25 @@
 
 # STEP 0: Run the $BEFORE_COMMIT_SCRIPT script if present
 BEFORE_COMMIT_SCRIPT=before_commit.sh;
-SCRIPT_PRESENT="no";
-DEAD_REPO_FILE="DEAD_REPO.md";
+BC_SCRIPT_PRESENT="no";
+DEAD_REPO_FILE=".DEAD_REPO";
+_GITSYNC_DISABLE=".GITSYNC_DISABLE"; # stop gitsync from working in the repo
 
-#    find the parent which has a the `.git` folder
+# STEP 1: Goto the base directory housing `./.git` sub-folder.
+
 ABS_PATH="`realpath .`";
-GIT_REPO_PATH=$ABS_PATH;
+_GIT_REPO_PATH="$ABS_PATH";
+_GIT_REPO_NAME="$(basename $_GIT_REPO_PATH)";
 for x in {1..20}; do    # just loop enough no. of times
-  if [[ -d $GIT_REPO_PATH/.git ]]; then
+  if [[ -d $_GIT_REPO_PATH/.git ]]; then
     # a git repository
-    if [[ -e $GIT_REPO_PATH/$BEFORE_COMMIT_SCRIPT ]]; then
-      SCRIPT_PRESENT="yes";
+    if [[ -e $_GIT_REPO_PATH/$BEFORE_COMMIT_SCRIPT ]]; then
+      BC_SCRIPT_PRESENT="yes";
     fi
     break;
   else
-    GIT_REPO_PATH="`dirname $GIT_REPO_PATH`";
+    _GIT_REPO_PATH="`dirname $_GIT_REPO_PATH`";
+    _GIT_REPO_NAME="$(basename $_GIT_REPO_PATH)";
   fi
 done
 
@@ -29,40 +33,55 @@ if [[ $x -eq 20 ]]; then
   exit 1;
 fi
 
-# IMPORTANT: cd into the root git repo directory
-cd $GIT_REPO_PATH; # go to the directory containing the script
 
-# IMPORTANT: if $DEAD_REPO_FILE is present then quit.
-if [[ -e $DEAD_REPO_FILE ]]; then
-  echo "Quitting: $GIT_REPO_PATH/$DEAD_REPO_FILE present. OK.";
+# STEP 2: cd into the root git repo directory (IMPORTANT)
+
+cd $_GIT_REPO_PATH; # go to the directory containing the script
+echo -e "\nAD: GIT_REPO: $_GIT_REPO_PATH";
+
+
+# STEP 3: quit if "${_GITSYNC_DISABLE}*" is present then quit (IMPORTANT).
+
+if [[ -z $(find -maxdepth 1 -name "${_GITSYNC_DISABLE}*") ]]; then
+  true; # then continue to next step
+else
+  echo "AD: GIT_REPO: $_GIT_REPO_NAME (DONE: Since ${_GITSYNC_DISABLE}* present)";
   exit 0; # no error
 fi
 
-echo "AD: GIT_REPO: $GIT_REPO_PATH";
 
-#    now execute the script if found
-if [[ $SCRIPT_PRESENT == "yes" ]]; then
+# STEP 4: now execute the BEFORE_COMMIT_SCRIPT if found
+
+if [[ $BC_SCRIPT_PRESENT == "yes" ]]; then
   echo "AD: Running $BEFORE_COMMIT_SCRIPT script.";
   if bash $BEFORE_COMMIT_SCRIPT; then
-    echo "    Successful $GIT_REPO_PATH/$BEFORE_COMMIT_SCRIPT";
+    echo "    Successful $_GIT_REPO_NAME/$BEFORE_COMMIT_SCRIPT";
   else
-    echo "    ERROR:     $GIT_REPO_PATH/$BEFORE_COMMIT_SCRIPT failed";
+    echo "    ERROR:     $_GIT_REPO_NAME/$BEFORE_COMMIT_SCRIPT failed";
     exit 3;
   fi
 else
-  echo "  NotPresent: $GIT_REPO_PATH/$BEFORE_COMMIT_SCRIPT ";
+  echo "  NotPresent: $_GIT_REPO_NAME/$BEFORE_COMMIT_SCRIPT ";
 fi
 
-# look for Makefile and execute `make clean` if target "clean" exists
-if [[ -e $GIT_REPO_PATH/Makefile ]]; then
+
+# STEP 5: look for Makefile and execute `make clean` if target "clean" exists
+
+if [[ -e $_GIT_REPO_PATH/Makefile ]]; then
   count="`egrep "^clean:" Makefile | wc -l`";
   if [[ $count -gt 0 ]]; then
-    echo "Running 'make clean' on: $GIT_REPO_PATH";
+    echo "Running 'make clean' on: $_GIT_REPO_NAME";
     make clean &> /dev/null;
   fi
 fi
 
-# STEP 0: Print urls and check connection to the remote repository.
+# STEP 6: get the current branch name
+
+_BRANCH_NAME="$(git branch)";     # e.g. value "* master"
+BRANCH_NAME="${_BRANCH_NAME:2}";  # i.e. remove "* " from prefix
+
+
+# STEP 7: Print urls and check connection to the remote repository.
 #         If connection is okay, then fetch the content.
 
 echo "AD: REPO : $(git remote get-url origin)"; # print the remote urls
@@ -76,11 +95,12 @@ else
 fi
 
 
-# STEP 1: Commit locally if needed.
+# STEP 7: Commit locally if needed.
 
-OUTPUT=$(git status --short)
+_OUTPUT=$(git status --short)
+_FRESH_COMMIT="yes";
 
-if [[ ! -z $OUTPUT ]]; then
+if [[ ! -z $_OUTPUT ]]; then
   echo -e "AD: GIT_STATUS: Uncommitted changes!!!!"
   git add --all
   if [[ $? -ne 0 ]]; then echo "ERROR: in adding"; exit 5; fi
@@ -94,12 +114,13 @@ if [[ ! -z $OUTPUT ]]; then
   fi
 else
   echo -e "AD: GIT STATUS: OK"
-  echo "AD: GIT_REPO: $GIT_REPO_PATH (DONE: OKAY (no commit/push))";
-  exit 0;
+  _FRESH_COMMIT="no";
+  echo "AD: GIT_REPO: $_GIT_REPO_NAME (DONE: OKAY (no commit needed))";
 fi
 
 
-# STEP 1.5: Print urls and check connection to the remote repository.
+# STEP 8: Print urls and check connection to the remote repository.
+#         Exit if connection test fails.
 
 echo "AD: REPO : $(git remote get-url origin)"; # print the remote urls
 
@@ -107,41 +128,47 @@ if git ls-remote origin; then
   echo "AD: OKAY : CONNECTION_TEST";
 else
   echo "AD: ERROR: CONNECTION_TEST"
-  echo "AD: GIT_REPO: $GIT_REPO_PATH (DONE: ERROR(s))";
+  echo "AD: GIT_REPO: $_GIT_REPO_NAME (DONE: ERROR(s))";
   exit 1;
 fi
 
 
-# STEP 2: Fetch remote/origin
+# STEP 9: Fetch remote/origin
 
 echo -e "\nAD: Fetching origin/master."
-git fetch origin master
-if [[ $? -ne 0 ]]; then echo "ERROR: in fetching"; exit 20; fi
+git fetch; # by default the current branch from its default source
+if [[ $? -ne 0 ]]; then
+  echo "AD: ERROR: $_GIT_REPO_NAME (DONE: fetching failed)"; exit 20;
+fi
 
-# STEP 3: Merge and push if master and origin/master differ.
+
+# STEP 10: Merge and push if $_BRANCH_NAME and origin/$_BRANCH_NAME differ.
 
 # A fresh repo has no branch `master`.
 # Check if `master` exists and only then run `git diff`.
-OUTPUT=$(git branch --list)
-if [[ -n "$OUTPUT" ]]; then
+_OUTPUT=$(git branch --list)
+if [[ -n "$_OUTPUT" ]]; then
   echo -e "\nAD: git diff master origin/master."
-  OUTPUT=$(git diff master origin/master)
-  if [[ -z $OUTPUT ]]; then
-     echo "Local state matches origin/master"
-     exit 0; # no error
+  _OUTPUT="$(git diff --quiet $_BRANCH_NAME origin/$_BRANCH_NAME)";
+  if [[ -z $_OUTPUT ]]; then
+    echo "AD: GIT_REPO: $_GIT_REPO_NAME (DONE: NO PUSH NEEDED)";
+    exit 0; # no error
   fi
 fi
 
-echo "AD: GIT_REPO: $GIT_REPO_PATH (DONE: NO PUSH NEEDED)";
+
+# STEP 11: Push the content to the remote.
+
 
 echo -e "\nAD: Local and Remote differ. Merging and Pushing."
 
 # reaches here only when any new content is present
 
-git merge -m "semi-automated-merge" origin/master
+git merge -m "semi-automated-merge" origin/$_BRANCH_NAME;
 if [[ $? -ne 0 ]]; then echo "ERROR: in merging"; exit 25; fi
-git push origin master
+git push; # origin master;
 if [[ $? -ne 0 ]]; then echo "ERROR: in pushing"; exit 30; fi
 
-echo "AD: GIT_REPO: $GIT_REPO_PATH (DONE: PUSHED CHANGES)";
+echo "AD: GIT_REPO: $_GIT_REPO_NAME (DONE: PUSHED CHANGES)";
+
 

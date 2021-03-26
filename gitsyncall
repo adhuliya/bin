@@ -4,7 +4,7 @@
 #
 # Commit and sync all git repos whose directory is suffixed with `-git`
 
-# update the file database
+# STEP 1: update the file database
 if [[ -z $MYMLOCATEDB ]]; then
   echo "$0: ERROR: MYMLOCATEDB env var not set properly!";
 else
@@ -15,6 +15,8 @@ else
     echo "$0: ERROR: directory does not exist `dirname $MYMLOCATEDB`";
   fi
 fi
+
+# STEP 2: Locate and save directories with `-git` suffix.
 
 TMP_OUT_FILE=`mktemp /dev/shm/tmp.XXXXXXXX`;
 TMP_FILE=`mktemp /dev/shm/tmp.XXXXXXXX`;
@@ -28,6 +30,7 @@ echo "TMP_REPO_LIST:  $TMP_REPO_LIST";
 # populate the TMP_FILE with files that end with '-git'
 locate -d $MYMLOCATEDB -r "-git$" > $TMP_FILE;
 
+# STEP 3: run `gitsync` on all git repositories
 count=0
 while read file; do
   if [[ -d "$file" && -d "$file/.git" ]]; then
@@ -42,6 +45,8 @@ while read file; do
     fi
   fi
 done < $TMP_FILE;
+
+# STEP 4: output some useful reports
 
 echo -e "\n\nRepos synced:\n";
 cat $TMP_REPO_LIST;
