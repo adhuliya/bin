@@ -69,7 +69,7 @@ echo "AD: REPO : $(git remote get-url origin)"; # print the remote urls
 
 if git ls-remote origin; then
   echo "AD: OKAY : CONNECTION_TEST";
-  git fetch;
+  git fetch; # only the current branch, from the default source
 else
   echo "AD: ERROR: CONNECTION_TEST"
   # exit 1; # don't exit here, need to commit locally.
