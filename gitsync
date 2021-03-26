@@ -125,7 +125,7 @@ fi
 
 echo "AD: REMOTE: $(git remote get-url origin)"; # print the remote urls
 
-if [[ $_CONNECTION_OKAY == "no" ]] then
+if [[ $_CONNECTION_OKAY == "no" ]]; then
   echo "AD: ERROR: CONNECTION_TEST"
   echo "AD: GIT_REPO: $_GIT_REPO_NAME (DONE: ERROR(s))";
   exit 1;
