@@ -77,8 +77,8 @@ fi
 
 # STEP 6: get the current branch name
 
-_BRANCH_NAME="$(git branch)";     # e.g. value "* master"
-BRANCH_NAME="${_BRANCH_NAME:2}";  # i.e. remove "* " from prefix
+__BRANCH_NAME="$(git branch)";     # e.g. value "* master"
+_BRANCH_NAME="${__BRANCH_NAME:2}";  # i.e. remove "* " from prefix
 
 
 # STEP 7: Print urls and check connection to the remote repository.
