@@ -62,12 +62,26 @@ if [[ -e $GIT_REPO_PATH/Makefile ]]; then
   fi
 fi
 
+# STEP 0: Print urls and check connection to the remote repository.
+#         If connection is okay, then fetch the content.
+
+echo "AD: REPO : $(git remote get-url origin)"; # print the remote urls
+
+if git ls-remote origin; then
+  echo "AD: OKAY : CONNECTION_TEST";
+  git fetch;
+else
+  echo "AD: ERROR: CONNECTION_TEST"
+  # exit 1; # don't exit here, need to commit locally.
+fi
+
+
 # STEP 1: Commit locally if needed.
 
 OUTPUT=$(git status --short)
 
 if [[ ! -z $OUTPUT ]]; then
-  echo -e "AD: GIT STATUS: Uncommitted changes!!!!"
+  echo -e "AD: GIT_STATUS: Uncommitted changes!!!!"
   git add --all
   if [[ $? -ne 0 ]]; then echo "ERROR: in adding"; exit 5; fi
 
