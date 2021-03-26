@@ -4,22 +4,21 @@
 
 # Commit and Sync the changes of local git repo with the remote.
 
-# STEP 0: Run the $BEFORE_COMMIT_SCRIPT script if present
-BEFORE_COMMIT_SCRIPT=before_commit.sh;
-BC_SCRIPT_PRESENT="no";
-DEAD_REPO_FILE=".DEAD_REPO";
+# STEP 0: Run the $_BEFORE_COMMIT_SCRIPT script if present
+_BEFORE_COMMIT_SCRIPT="before_commit.sh";
+_BC_SCRIPT_PRESENT="no";
 _GITSYNC_DISABLE=".GITSYNC_DISABLE"; # stop gitsync from working in the repo
 
 # STEP 1: Goto the base directory housing `./.git` sub-folder.
 
-ABS_PATH="`realpath .`";
-_GIT_REPO_PATH="$ABS_PATH";
+_ABS_PATH="`realpath .`";
+_GIT_REPO_PATH="$_ABS_PATH";
 _GIT_REPO_NAME="$(basename $_GIT_REPO_PATH)";
 for x in {1..20}; do    # just loop enough no. of times
   if [[ -d $_GIT_REPO_PATH/.git ]]; then
     # a git repository
-    if [[ -e $_GIT_REPO_PATH/$BEFORE_COMMIT_SCRIPT ]]; then
-      BC_SCRIPT_PRESENT="yes";
+    if [[ -e $_GIT_REPO_PATH/$_BEFORE_COMMIT_SCRIPT ]]; then
+      _BC_SCRIPT_PRESENT="yes";
     fi
     break;
   else
@@ -50,18 +49,18 @@ else
 fi
 
 
-# STEP 4: now execute the BEFORE_COMMIT_SCRIPT if found
+# STEP 4: now execute the _BEFORE_COMMIT_SCRIPT if found
 
-if [[ $BC_SCRIPT_PRESENT == "yes" ]]; then
-  echo "AD: Running $BEFORE_COMMIT_SCRIPT script.";
-  if bash $BEFORE_COMMIT_SCRIPT; then
-    echo "    Successful $_GIT_REPO_NAME/$BEFORE_COMMIT_SCRIPT";
+if [[ $_BC_SCRIPT_PRESENT == "yes" ]]; then
+  echo "AD: Running $_BEFORE_COMMIT_SCRIPT script.";
+  if bash $_BEFORE_COMMIT_SCRIPT; then
+    echo "    Successful $_GIT_REPO_NAME/$_BEFORE_COMMIT_SCRIPT";
   else
-    echo "    ERROR:     $_GIT_REPO_NAME/$BEFORE_COMMIT_SCRIPT failed";
+    echo "    ERROR:     $_GIT_REPO_NAME/$_BEFORE_COMMIT_SCRIPT failed";
     exit 3;
   fi
 else
-  echo "  NotPresent: $_GIT_REPO_NAME/$BEFORE_COMMIT_SCRIPT ";
+  echo "  NotPresent: $_GIT_REPO_NAME/$_BEFORE_COMMIT_SCRIPT ";
 fi
 
 
