@@ -86,47 +86,46 @@ _BRANCH_NAME="${__BRANCH_NAME:2}";  # i.e. remove "* " from prefix
 
 echo "AD: REPO : $(git remote get-url origin)"; # print the remote urls
 
+_CONNECTION_OKAY="yes";
 if git ls-remote origin; then
   echo "AD: OKAY : CONNECTION_TEST";
   git fetch; # only the current branch, from the default source
 else
   echo "AD: ERROR: CONNECTION_TEST"
+  _CONNECTION_OKAY="no";
   # exit 1; # don't exit here, need to commit locally.
 fi
 
 
 # STEP 7: Commit locally if needed.
 
-_OUTPUT=$(git status --short)
-_FRESH_COMMIT="yes";
+_OUTPUT="$(git status --short)";
 
 if [[ ! -z $_OUTPUT ]]; then
-  echo -e "AD: GIT_STATUS: Uncommitted changes!!!!"
-  git add --all
+  echo -e "AD: GIT_REPO: $_GIT_REPO_NAME: Uncommitted changes!!!!";
+  git add --all;
   if [[ $? -ne 0 ]]; then echo "ERROR: in adding"; exit 5; fi
 
   if [ "$1" == "" ]; then
-    git commit -m 'semi-automated-update'
+    git commit -m 'semi-automated-update';
     if [[ $? -ne 0 ]]; then echo "ERROR: in commiting"; exit 10; fi
   else
-    git commit -m "$1"
+    git commit -m "$1";
     if [[ $? -ne 0 ]]; then echo "ERROR: in commiting"; exit 15; fi
   fi
+  echo -e "AD: GIT_REPO: $_GIT_REPO_NAME (DONE: commit)";
 else
-  echo -e "AD: GIT STATUS: OK"
-  _FRESH_COMMIT="no";
-  echo "AD: GIT_REPO: $_GIT_REPO_NAME (DONE: OKAY (no commit needed))";
+  echo -e "AD: GIT_STATUS: Okay";
+  echo "AD: GIT_REPO: $_GIT_REPO_NAME: No commit needed";
 fi
 
 
 # STEP 8: Print urls and check connection to the remote repository.
 #         Exit if connection test fails.
 
-echo "AD: REPO : $(git remote get-url origin)"; # print the remote urls
+echo "AD: REMOTE: $(git remote get-url origin)"; # print the remote urls
 
-if git ls-remote origin; then
-  echo "AD: OKAY : CONNECTION_TEST";
-else
+if [[ $_CONNECTION_OKAY == "no" ]] then
   echo "AD: ERROR: CONNECTION_TEST"
   echo "AD: GIT_REPO: $_GIT_REPO_NAME (DONE: ERROR(s))";
   exit 1;
@@ -138,14 +137,14 @@ fi
 echo -e "\nAD: Fetching origin/master."
 git fetch; # by default the current branch from its default source
 if [[ $? -ne 0 ]]; then
-  echo "AD: ERROR: $_GIT_REPO_NAME (DONE: fetching failed)"; exit 20;
+  echo "AD: ERROR: $_GIT_REPO_NAME: Fetching failed"; exit 20;
 fi
 
 
 # STEP 10: Merge and push if $_BRANCH_NAME and origin/$_BRANCH_NAME differ.
 
 if git diff --quiet $_BRANCH_NAME origin/$_BRANCH_NAME; then
-  echo "AD: GIT_REPO: $_GIT_REPO_NAME (DONE: NO PUSH NEEDED)";
+  echo "AD: GIT_REPO: $_GIT_REPO_NAME: DONE: No push needed";
   exit 0; # no error
 fi
 
