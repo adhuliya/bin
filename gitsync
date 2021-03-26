@@ -86,7 +86,7 @@ fi
 
 # STEP 1.5: Print urls and check connection to the remote repository.
 
-git remote get-url --all origin; # print the remote urls
+echo "AD: REPO : $(git remote get-url origin)"; # print the remote urls
 
 if git ls-remote origin; then
   echo "AD: OKAY : CONNECTION_TEST";
