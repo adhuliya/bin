@@ -144,23 +144,15 @@ fi
 
 # STEP 10: Merge and push if $_BRANCH_NAME and origin/$_BRANCH_NAME differ.
 
-# A fresh repo has no branch `master`.
-# Check if `master` exists and only then run `git diff`.
-_OUTPUT=$(git branch --list)
-if [[ -n "$_OUTPUT" ]]; then
-  echo -e "\nAD: git diff master origin/master."
-  _OUTPUT="$(git diff --quiet $_BRANCH_NAME origin/$_BRANCH_NAME)";
-  if [[ -z $_OUTPUT ]]; then
-    echo "AD: GIT_REPO: $_GIT_REPO_NAME (DONE: NO PUSH NEEDED)";
-    exit 0; # no error
-  fi
+if git diff --quiet $_BRANCH_NAME origin/$_BRANCH_NAME; then
+  echo "AD: GIT_REPO: $_GIT_REPO_NAME (DONE: NO PUSH NEEDED)";
+  exit 0; # no error
 fi
 
 
 # STEP 11: Push the content to the remote.
 
-
-echo -e "\nAD: Local and Remote differ. Merging and Pushing."
+echo -e "\nAD: Local and Remote differ. MERGE and PUSH";
 
 # reaches here only when any new content is present
 
